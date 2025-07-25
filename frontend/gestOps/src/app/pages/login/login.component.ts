@@ -70,7 +70,7 @@ export class LoginComponent {
           console.log('Login exitoso:', response);
         },
         error: (err) => {
-          this.loginError.set('Credenciales inválidas. Intente nuevamente.');
+          this.loginError.set('No se pudo iniciar sesión');
           console.error('Error en login:', err);
         },
       });

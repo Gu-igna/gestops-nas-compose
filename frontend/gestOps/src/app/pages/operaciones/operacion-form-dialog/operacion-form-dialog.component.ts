@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
 import { Observable, startWith, map, forkJoin, finalize } from 'rxjs';
 
-import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog'; // Import MatDialog
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -19,6 +19,8 @@ import { OperacionesService } from '../../../services/operaciones/operaciones.se
 import { EntitiesService, Entity } from '../../../services/entities/entities.service';
 import { SubcategoriasService, Subcategoria, Categoria, Concepto } from '../../../services/subcategorias/subcategorias.service';
 import { FileValidationService } from '../../../services/file-validation/file-validation.service';
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { FechaConfirmDialogComponent } from '../fecha-confirm-dialog/fecha-confirm-dialog.component'; // Import FechaConfirmDialogComponent
 
 export interface Operacion {
   id?: number;
@@ -55,14 +57,25 @@ export interface Operacion {
     CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatDatepickerModule,
     MatButtonToggleModule, MatIconModule, MatAutocompleteModule,
-    MatRippleModule, MatProgressSpinnerModule
+    MatRippleModule, MatProgressSpinnerModule,
+    FechaConfirmDialogComponent // Add FechaConfirmDialogComponent to imports
   ],
   providers: [
     provideNativeDateAdapter(),
     OperacionesService,
     EntitiesService,
     SubcategoriasService,
-    FileValidationService
+    FileValidationService,
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: MAT_DATE_FORMATS, useValue: {
+      parse: { dateInput: 'YYYY-MM-DD' },
+      display: {
+        dateInput: 'YYYY-MM-DD',
+        monthYearLabel: 'YYYY MMM',
+        dateA11yLabel: 'YYYY-MM-DD',
+        monthYearA11yLabel: 'YYYY MMM',
+      }
+    } }
   ],
   templateUrl: './operacion-form-dialog.component.html',
   styleUrls: ['./operacion-form-dialog.component.css']
@@ -75,6 +88,7 @@ export class OperacionFormDialogComponent implements OnInit {
   private subcategoriasService = inject(SubcategoriasService);
   private fileValidationService = inject(FileValidationService);
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog); // Inject MatDialog
 
   public loading = false;
   public operacionForm!: FormGroup;
@@ -120,13 +134,16 @@ export class OperacionFormDialogComponent implements OnInit {
     });
 
     this.operacionForm.get('monto_total')?.valueChanges.subscribe(value => {
-      if (typeof value === 'string' && value.includes('-')) {
-        const absValue = Math.abs(Number(value));
-        if (!isNaN(absValue)) {
-          this.operacionForm.get('monto_total')?.setValue(absValue, { emitEvent: false });
-        }
+      if (typeof value === 'string') {
+      let newValue = value.replace(',', '.');
+      if (newValue.includes('-')) {
+        newValue = Math.abs(Number(newValue)).toString();
+      }
+      if (!isNaN(Number(newValue))) {
+        this.operacionForm.get('monto_total')?.setValue(Number(newValue), { emitEvent: false });
+      }
       } else if (typeof value === 'number' && value < 0) {
-        this.operacionForm.get('monto_total')?.setValue(Math.abs(value), { emitEvent: false });
+      this.operacionForm.get('monto_total')?.setValue(Math.abs(value), { emitEvent: false });
       }
     });
 
@@ -400,13 +417,29 @@ export class OperacionFormDialogComponent implements OnInit {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
+    // Check if the selected date is in the past and it's a new operation
     if (fechaSeleccionada < hoy && this.mode === 'create') {
-      if (!window.confirm('La fecha seleccionada es anterior a hoy. ¿Desea continuar?')) {
-        return;
-      }
-      window.alert('Atención: La operación se registrará con una fecha pasada.');
-    }
+      const dialogRef = this.dialog.open(FechaConfirmDialogComponent, {
+        data: {
+          message: 'La fecha seleccionada es anterior a hoy. ¿Desea continuar?',
+          showCancelButton: true
+        }
+      });
 
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) { // If user clicked 'Aceptar' (Continue)
+          this.proceedSubmit();
+        } else { // If user clicked 'Cancelar'
+          this.loading = false; // Ensure loading is false if submission is cancelled
+        }
+      });
+    } else {
+      // If date is not in the past or it's an update, proceed directly
+      this.proceedSubmit();
+    }
+  }
+
+  private proceedSubmit(): void {
     this.loading = true;
 
     if (this.mode === 'create') {
@@ -425,12 +458,24 @@ export class OperacionFormDialogComponent implements OnInit {
             this.dialogRef.close(operacionCreada);
           }
         },
-        error: () => window.alert('Error al crear la operación.')
+        error: () => {
+          this.dialog.open(FechaConfirmDialogComponent, {
+            data: {
+              message: 'Error al crear la operación.',
+              showCancelButton: false
+            }
+          });
+        }
       });
     } else {
       const changedValues = this.getChangedValues();
       if (Object.keys(changedValues).length === 0 && Object.keys(this.selectedFiles).length === 0) {
-        window.alert('No hay cambios para guardar.');
+        this.dialog.open(FechaConfirmDialogComponent, {
+          data: {
+            message: 'No hay cambios para guardar.',
+            showCancelButton: false
+          }
+        });
         this.loading = false;
         this.dialogRef.close();
         return;
@@ -452,7 +497,14 @@ export class OperacionFormDialogComponent implements OnInit {
             this.dialogRef.close(updatedOperacion);
           }
         },
-        error: () => window.alert('Error al actualizar la operación.')
+        error: () => {
+          this.dialog.open(FechaConfirmDialogComponent, {
+            data: {
+              message: 'Error al actualizar la operación.',
+              showCancelButton: false
+            }
+          });
+        }
       });
     }
   }
@@ -529,7 +581,12 @@ export class OperacionFormDialogComponent implements OnInit {
           next: () => this.dialogRef.close(this.originalOperacion || {}),
           error: (error) => {
             console.error('Error al subir archivos en creación:', error);
-            window.alert('Operación creada, pero ocurrió un error al subir los archivos.');
+            this.dialog.open(FechaConfirmDialogComponent, {
+              data: {
+                message: 'Operación creada, pero ocurrió un error al subir los archivos.',
+                showCancelButton: false
+              }
+            });
             this.dialogRef.close(this.originalOperacion || {});
           }
         });
@@ -557,7 +614,12 @@ export class OperacionFormDialogComponent implements OnInit {
           next: () => this.dialogRef.close(this.originalOperacion || {}),
           error: (error) => {
             console.error('Error al subir archivos:', error);
-            window.alert('Operación actualizada, pero ocurrió un error al subir los archivos.');
+            this.dialog.open(FechaConfirmDialogComponent, {
+              data: {
+                message: 'Operación actualizada, pero ocurrió un error al subir los archivos.',
+                showCancelButton: false
+              }
+            });
             this.dialogRef.close(this.originalOperacion || {});
           }
         });

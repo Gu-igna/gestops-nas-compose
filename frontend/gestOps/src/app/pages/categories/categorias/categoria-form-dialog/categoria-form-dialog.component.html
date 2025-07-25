@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>{{ mode === 'create' ? 'Crear categoria' : 'Actualizar categoria' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="categoriaForm()">
+    <div class="flex gap-4 flex-col">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Nombre" required>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="w-full">
+        <mat-label>Concepto</mat-label>
+        <input type="text" placeholder="Seleccione un concepto" aria-label="Concepto" matInput
+          formControlName="conceptoText" [matAutocomplete]="auto" required>
+        @if (categoriaForm().get('id_concepto')!.hasError('idConceptoInvalido')) {
+          <mat-error>Debe seleccionar un concepto válido del listado</mat-error>
+        }
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+          @for (concepto of conceptos(); track concepto.id) {
+          <mat-option [value]="concepto">{{ concepto.nombre }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-button (click)="save()" [disabled]="categoriaForm().invalid">
+    {{ mode === 'create' ? 'Guardar' : 'Actualizar' }}
+  </button>
+</mat-dialog-actions>

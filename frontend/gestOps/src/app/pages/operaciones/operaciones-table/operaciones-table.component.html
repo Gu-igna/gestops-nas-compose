@@ -1,0 +1,280 @@
+<div class="flex justify-center">
+    <div class="w-full max-w-98/100">
+        <div class="flex justify-around">
+            <div class="pt-2">
+                <button mat-raised-button (click)="openCreateDialog()">
+                    <mat-icon>add_box</mat-icon>
+                    Crear operación
+                </button>
+            </div>
+            <div class="flex flex-row">
+                <mat-form-field class="text-xs w-[220px]">
+                    <mat-label>Filtro global</mat-label>
+                    <input matInput [(ngModel)]="filtroGlobal"
+                        (input)="applyFilter('global', $any($event.target).value)"
+                        placeholder="Buscar en todas las columnas...">
+                </mat-form-field>
+                <div>
+                    <button mat-button (click)="clearFilters()" class="mt-2">
+                        <mat-icon>clear</mat-icon>
+                        Limpiar Filtros
+                    </button>
+                </div>
+            </div>
+            <div>
+                <button mat-fab extended (click)="downloadExcel()" [disabled]="isDownloadingExcel">
+                    <mat-icon>browser_updated</mat-icon>
+                    {{isDownloadingExcel ? 'Descargando...' : 'Descargar Excel'}}
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 m-0">
+
+            <mat-form-field class="w-[78px] text-xs h-[65px]">
+                <mat-label class="text-xs">Id</mat-label>
+                <input matInput [(ngModel)]="filtroId" (input)="applyFilter('id', $any($event.target).value)"
+                    placeholder="ID">
+            </mat-form-field>
+
+            <mat-form-field class="w-[104px] text-xs h-[65px]">
+                <mat-label class="text-xs">Fecha</mat-label>
+                <input matInput [(ngModel)]="filtroFecha" (input)="applyFilter('fecha', $any($event.target).value)"
+                    placeholder="YYYY-MM-DD">
+            </mat-form-field>
+
+            <mat-form-field class="w-[79px] text-xs h-[65px]">
+                <mat-label class="text-xs">Tipo</mat-label>
+                <input matInput [(ngModel)]="filtroTipo" (input)="applyFilter('tipo', $any($event.target).value)"
+                    placeholder="ing/egr">
+            </mat-form-field>
+
+            <mat-form-field class="w-[96px] text-xs h-[65px]">
+                <mat-label class="text-xs">Carácter</mat-label>
+                <input matInput [(ngModel)]="filtroCaracter"
+                    (input)="applyFilter('caracter', $any($event.target).value)" placeholder="casa/ofic">
+            </mat-form-field>
+
+            <mat-form-field class="w-[110px] text-xs h-[65px]">
+                <mat-label class="text-xs">Naturaleza</mat-label>
+                <input matInput [(ngModel)]="filtroNaturaleza"
+                    (input)="applyFilter('naturaleza', $any($event.target).value)" placeholder="débito/créd">
+            </mat-form-field>
+
+            <mat-form-field class="w-[164px] text-xs h-[65px]">
+                <mat-label class="text-xs">Concepto</mat-label>
+                <input matInput [(ngModel)]="filtroConcepto"
+                    (input)="applyFilter('concepto', $any($event.target).value)" placeholder="Concepto">
+            </mat-form-field>
+
+            <mat-form-field class="w-[126px] text-xs h-[65px]">
+                <mat-label class="text-xs">Categoría</mat-label>
+                <input matInput [(ngModel)]="filtroCategoria"
+                    (input)="applyFilter('categoria', $any($event.target).value)" placeholder="Categoría">
+            </mat-form-field>
+
+            <mat-form-field class="w-[180px] text-xs h-[65px]">
+                <mat-label class="text-xs">Subcategoría</mat-label>
+                <input matInput [(ngModel)]="filtroSubcategoria"
+                    (input)="applyFilter('subcategoria', $any($event.target).value)" placeholder="Subcategoría">
+            </mat-form-field>
+
+            <mat-form-field class="w-[130px] text-xs h-[65px]">
+                <mat-label class="text-xs">Razón social</mat-label>
+                <input matInput [(ngModel)]="filtroPersona" (input)="applyFilter('persona', $any($event.target).value)"
+                    placeholder="Razón social">
+            </mat-form-field>
+
+            <mat-form-field class="w-[120px] text-xs h-[65px]">
+                <mat-label class="text-xs">Cuit</mat-label>
+                <input matInput [(ngModel)]="filtroCuit" (input)="applyFilter('cuit', $any($event.target).value)"
+                    placeholder="CUIT">
+            </mat-form-field>
+
+            <mat-form-field class="w-[130px] text-xs h-[65px]">
+                <mat-label class="text-xs">Comprobante</mat-label>
+                <input matInput [(ngModel)]="filtroOption" (input)="applyFilter('option', $any($event.target).value)"
+                    placeholder="T. comprobante">
+            </mat-form-field>
+
+            <mat-form-field class="w-[150px] text-xs h-[65px]">
+                <mat-label class="text-xs">Núm comprobante</mat-label>
+                <input matInput [(ngModel)]="filtroCodigo" (input)="applyFilter('codigo', $any($event.target).value)"
+                    placeholder="Núm comprobante">
+            </mat-form-field>
+
+            <mat-form-field class="w-[132px] text-xs h-[65px]">
+                <mat-label class="text-xs" class="text-xs">Importe</mat-label>
+                <input matInput [(ngModel)]="filtroMonto" (input)="applyFilter('monto', $any($event.target).value)"
+                    placeholder="Importe">
+            </mat-form-field>
+
+            <mat-form-field class="w-[112px] text-xs h-[65px]">
+                <mat-label class="text-xs">Usuario</mat-label>
+                <input matInput [(ngModel)]="filtroUsuario" (input)="applyFilter('usuario', $any($event.target).value)"
+                    placeholder="Usuario">
+            </mat-form-field>
+        </div>
+
+
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort
+                class="border-1 border-gray-500 table-fixed">
+                @for (column of columnsToDisplay; track column) {
+                <ng-container matColumnDef="{{column}}">
+                    <th mat-header-cell *matHeaderCellDef [class]="headerColor" mat-sort-header
+                        [ngClass]="getColumnWidthClass(column)"> {{column === 'subcategoria' ? 'Subcategoría' :
+                        column === 'categoria' ? 'Categoría' :
+                        column === 'razon_social' ? 'Razón social' :
+                        column === 'option' ? 'Tipo de comprobante' :
+                        column === 'codigo' ? 'Número de comprobante' :
+                        column === 'monto_total' ? 'Importe' :
+                        (column | titlecase).split('_').join(' ')}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" [ngClass]="getColumnWidthClass(column)"> {{element[column]}}
+                    </td>
+                </ng-container>
+                }
+                <ng-container matColumnDef="expand">
+                    <th mat-header-cell *matHeaderCellDef aria-label="row actions" [class]="headerColor"
+                        class="w-[73px]">&nbsp;</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button aria-label="expand row"
+                            (click)="toggle(element); $event.stopPropagation()" class="operation-toggle-button"
+                            [class.operation-toggle-button-expanded]="isExpanded(element)">
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="expandedDetail">
+                    <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpand.length">
+                        <div class="operation-element-detail-wrapper"
+                            [class.operation-element-detail-wrapper-expanded]="isExpanded(element)">
+                            <div class="operation-element-detail">
+                                <div class="flex flex-row">
+                                    <div class="flex-col mr-1 ml-1 min-w-35 justify-items-center">
+                                        <p class="mt-2.5">Comprobante:</p>
+                                        @if (element.comprobante_path) {
+                                        <button mat-button
+                                            (click)="openFileViewer(element.comprobante_path, 'Comprobante', element.id)">
+                                            <mat-icon class="align-middle mr-1">picture_as_pdf</mat-icon>
+                                            Ver archivo
+                                        </button>
+                                        } @else {
+                                        <button mat-button disabled>
+                                            <mat-icon class="align-middle mr-1 text-gray-400">description</mat-icon>
+                                            No disponible
+                                        </button>
+                                        }
+                                    </div>
+                                    <div class="flex-col mr-1 ml-1 min-w-35 justify-items-center">
+                                        <p class="mt-2.5">Archivo1:</p>
+                                        @if (element.archivo1_path) {
+                                        <button mat-button
+                                            (click)="openFileViewer(element.archivo1_path, 'Archivo 1', 'document', element.id)">
+                                            <mat-icon class="align-middle mr-1">description</mat-icon>
+                                            Ver archivo1
+                                        </button>
+                                        } @else {
+                                        <button mat-button disabled>
+                                            <mat-icon class="align-middle mr-1 text-gray-400">description</mat-icon>
+                                            No disponible
+                                        </button>
+                                        }
+                                    </div>
+                                    <div class="flex-col mr-1 ml-1 min-w-35 justify-items-center">
+                                        <p class="mt-2.5">Archivo2:</p>
+                                        @if (element.archivo2_path) {
+                                        <button mat-button
+                                            (click)="openFileViewer(element.archivo2_path, 'Archivo 2', 'document', element.id)">
+                                            <mat-icon class="align-middle mr-1">description</mat-icon>
+                                            Ver archivo2
+                                        </button>
+                                        } @else {
+                                        <button mat-button disabled>
+                                            <mat-icon class="align-middle mr-1 text-gray-400">description</mat-icon>
+                                            No disponible
+                                        </button>
+                                        }
+                                    </div>
+                                    <div class="flex-col mr-1 ml-1 min-w-35 justify-items-center">
+                                        <p class="mt-2.5">Archivo3:</p>
+                                        @if (element.archivo3_path) {
+                                        <button mat-button
+                                            (click)="openFileViewer(element.archivo3_path, 'Archivo 3', 'document', element.id)">
+                                            <mat-icon class="align-middle mr-1">description</mat-icon>
+                                            Ver archivo3
+                                        </button>
+                                        } @else {
+                                        <button mat-button disabled>
+                                            <mat-icon class="align-middle mr-1 text-gray-400">description</mat-icon>
+                                            No disponible
+                                        </button>
+                                        }
+                                    </div>
+                                    <div class="flex-col mr-1 ml-1 min-w-35 justify-items-center self-center">
+                                        <p>Método de pago:</p>
+                                        <p>{{element.metodo_de_pago}}</p>
+                                    </div>
+                                    <div class="flex-col mr-3 ml-3 w-200 justify-items-center self-center">
+                                        <p>Observaciones:</p>
+                                        <p>{{element.observaciones}}</p>
+                                    </div>
+                                    <div class="flex-col mr-10 ml-3 mix-w-30 max-w-30 self-center text-center">
+                                        @if (element.modificado_por_otro) {
+                                        <p>Modificado por otro</p>
+                                        } @else {
+                                        <p>Sin modificar</p>
+                                        }
+                                    </div>
+                                    <div class="flex-col mr-6 ml-3 justify-items-center">
+                                        <button mat-mini-fab class=" bg-amber-500/65 mt-3.5"
+                                            (click)="openUpdateDialog(element.id)">
+                                            <mat-icon>edit_squared_outlined</mat-icon>
+                                        </button>
+                                    </div>
+                                    <div class="flex-col mr-3 ml-3 justify-items-center">
+                                        <button mat-mini-fab class="bg-red-500/75 mt-3.5"
+                                            (click)="openDeleteOperationDialog(element.id)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
+                <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand;" class="operation-element-row"
+                    [class.operation-expanded-row]="isExpanded(element)" (click)="toggle(element)">
+                </tr>
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="operation-detail-row"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" [length]="totalOperaciones" [pageSize]="pageSize"
+                [pageIndex]="currentPage - 1" (page)="onPageChange($event)" showFirstLastButtons
+                aria-label="Select page of periodic elements" class="bg-gray-300">
+            </mat-paginator>
+        </div>
+
+        <div class=" mt-10 mb-5">
+            <mat-card class="rounded-none" style="background-color: var(--mat-sys-surface-variant);">
+                <mat-card-content style="border: 1px solid var(--mat-sys-outline);">
+                    <div class="flex flex-row justify-around">
+                        <div>
+                            <span class="font-bold">Total:&nbsp;&nbsp;</span>
+                            <span class="font-bold text-gray-700">ARS {{formatNumber(totalGeneral)}}</span>
+                        </div>
+                        <div>
+                            <span class="font-bold">Ingresos:&nbsp;&nbsp;</span>
+                            <span class="font-bold text-green-700">ARS {{formatNumber(totalIngresos)}}</span>
+                        </div>
+                        <div>
+                            <span class="font-bold">Egresos:&nbsp;&nbsp;</span>
+                            <span class="font-bold text-red-600">ARS {{formatNumber(totalEgresos)}}</span>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="flex flex-col h-full">
+    <div
+        class="flex justify-between items-center pt-1 pb-0 m-0 pr-4 pl-4 border-b border-gray-300 bg-gray-100 md:flex-row flex-col md:gap-0 gap-3">
+        <div class="md:text-left">
+            <h2 mat-dialog-title class="text-2xl font-medium text-gray-800">{{data.fileName}}</h2>
+        </div>
+        <div class="flex gap-2 md:justify-end justify-center pb-2">
+            <button mat-icon-button (click)="onDownload()" title="Descargar archivo">
+                <mat-icon>download</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openInNewTab()" title="Abrir en nueva pestaña">
+                <mat-icon>open_in_new</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onClose()" title="Cerrar">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+
+    <div class="flex-1 overflow-auto p-0 m-0 h-full">
+        <!-- Visor de PDF -->
+        @if (data.fileType === 'pdf') {
+        <iframe [src]="safeUrl" class="w-full h-full border-0" frameborder="0">
+            <p class="p-4 text-gray-600">Tu navegador no puede mostrar PDFs.
+                <a [href]="data.fileUrl" target="_blank" class="text-blue-600 underline">Haz clic aquí para descargar el
+                    archivo.</a>
+            </p>
+        </iframe>
+        }
+
+        <!-- Visor de imágenes -->
+        @if (data.fileType === 'image') {
+        <div class="flex flex-1 justify-center items-center p-4 bg-gray-50 h-full">
+            <img [src]="data.fileUrl" [alt]="data.fileName" class="max-w-full max-h-full object-contain shadow-2xl">
+        </div>
+        }
+
+        <!-- Visor de documentos generales -->
+        @if (data.fileType === 'document') {
+        <div class="flex justify-center items-center bg-gray-50 h-full">
+            <div class="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
+                <mat-icon class="text-8xl h-25 w-25 text-gray-600 mb-0">description</mat-icon>
+                <h3 class="my-4 mx-0 text-gray-800 break-words font-bold text-xl">{{data.fileName}}</h3>
+                <p class="text-gray-700 mb-6">Previsualización no disponible para este tipo de archivo.</p>
+            </div>
+        </div>
+        }
+    </div>
+</div>

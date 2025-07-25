@@ -1,0 +1,58 @@
+services:
+  # Definición del servicio de tu aplicación Angular (Frontend)
+  frontend:
+    # 'build' le dice a Docker Compose que construya la imagen para este servicio
+    # usando el Dockerfile que se encuentra en la ruta especificada.
+    # La ruta es relativa a la ubicación de este docker-compose.yml.
+    build: ./frontend/gestOps 
+    
+    # 'ports' mapea los puertos entre tu NAS y el contenedor Docker.
+    # "8080:80" significa que el puerto 8080 de tu NAS se mapeará al puerto 80 del contenedor 'frontend'.
+    # Esto es para acceso LOCAL (ej. http://IP_DE_TU_NAS). Cloudflare Tunnel no usará este mapeo.
+    ports:
+      - "8080:80" 
+    
+    # 'depends_on' asegura que el servicio 'backend' se inicie antes que el 'frontend'.
+    # Esto es útil si el frontend necesita que el backend esté disponible al iniciar.
+    depends_on:
+      - backend
+    
+    # Asigna este servicio a la red personalizada 'app-network'.
+    # Esto permite que los servicios se comuniquen entre sí por sus nombres de servicio.
+    networks:
+      - app-network
+    restart: always
+
+  # Definición del servicio de tu aplicación Flask (Backend)
+  backend:
+    # 'build' le dice a Docker Compose que construya la imagen para este servicio
+    # usando el Dockerfile que se encuentra en la ruta especificada.
+    build: ./backend
+    
+    # 'env_file' carga variables de entorno desde el archivo ./.env.
+    # El archivo .env debe estar en la misma carpeta que este docker-compose.yml.
+    env_file:
+      - ./.env
+    
+    # 'volumes' mapea directorios entre tu NAS y el contenedor Docker.
+    # Esto es CRUCIAL para la persistencia de datos (base de datos SQLite, archivos subidos).
+    #
+    # ¡MUY IMPORTANTE! Debes reemplazar 'YOUR_RAID_DISK_UUID' con el UUID real de tu disco RAID 1.
+    # La ruta completa en tu NAS (lado izquierdo del ':') debe ser la carpeta que creaste
+    # para los datos de tu aplicación (ej. /srv/dev-disk-by-uuid-XXXX/Datos/app_data).
+    # La ruta dentro del contenedor (lado derecho del ':') es donde tu aplicación Flask
+    # esperará encontrar y guardar los datos (ej. /app/data).
+    volumes:
+      - /srv/dev-disk-by-uuid-e1688f1c-ca8f-4b9e-bbc1-32aef67f601b/Datos/app_data:/app/data
+    
+    # Asigna este servicio a la misma red personalizada 'app-network'.
+    networks:
+      - app-network
+    restart: always
+    
+# Definición de la red personalizada.
+# Esto crea una red virtual interna donde tus contenedores pueden comunicarse
+# usando sus nombres de servicio (ej. 'frontend' puede hablar con 'backend').
+networks:
+  app-network:
+    driver: bridge # 'bridge' es el tipo de red por defecto y más común.

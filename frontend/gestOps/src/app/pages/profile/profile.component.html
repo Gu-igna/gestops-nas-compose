@@ -1,0 +1,104 @@
+<div class="fixed top-0 w-full z-50">
+    <app-navbar></app-navbar>
+</div>
+
+<div class="flex flex-col items-center justify-center min-h-[90vh] p-4">
+    <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+        <h4 class="text-2xl mb-3">Perfil</h4>
+
+        <form class="w-full min-h-45" [formGroup]="profileForm()">
+
+            <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" />
+                <mat-icon matPrefix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Apellido</mat-label>
+                <input matInput formControlName="apellido" />
+                <mat-icon matPrefix>contact_emergency</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Correo Electrónico</mat-label>
+                <input matInput formControlName="email" />
+                <mat-icon matPrefix>contact_mail</mat-icon>
+            </mat-form-field>
+
+            @if (showSpinner()) {
+            <div class="w-full flex flex-col items-center justify-center h-[276px]">
+                <mat-spinner diameter="120" class="mx-auto mb-8"></mat-spinner>
+                <p class="text-gray-500 font-bold text-xl">Actualizando perfil...</p>
+            </div>
+            } @else if (successMessage()) {
+            <div class="w-full flex flex-col items-center justify-center h-[276px] rounded-lg p-4"
+                [class]="getMessageClasses()">
+                <div class="text-center">
+                    <p class="text-xl font-semibold">{{ successMessage() }}</p>
+                </div>
+            </div>
+            } @else {
+            <div>
+                <div class="flex flex-row justify-center w-full mb-2">
+                    <mat-slide-toggle [checked]="isPasswordChangeEnabled"
+                        (change)="togglePasswordChange($event)">Cambiar
+                        Contraseña</mat-slide-toggle>
+                </div>
+                <mat-form-field class="w-full" appearance="fill">
+                    <mat-label>Contraseña Actual</mat-label>
+                    <input matInput [type]="hideActualPassword() ? 'password' : 'text'"
+                        formControlName="actualPassword" />
+                    <mat-icon matPrefix>lock_person</mat-icon>
+                    <button mat-icon-button matSuffix (click)="clickEventP($event)" [attr.aria-label]="'Hide password'"
+                        [attr.aria-pressed]="hideActualPassword()" [disabled]="!isPasswordChangeEnabled">
+                        <mat-icon>{{hideActualPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <mat-form-field class="w-full" appearance="fill">
+                    <mat-label>Nueva Contraseña</mat-label>
+                    <input matInput [type]="hideNewPassword() ? 'password' : 'text'" formControlName="newPassword" />
+                    <mat-icon matPrefix>password</mat-icon>
+                    <button mat-icon-button matSuffix (click)="clickEventNP($event)" [attr.aria-label]="'Hide password'"
+                        [attr.aria-pressed]="hideNewPassword()" [disabled]="!isPasswordChangeEnabled">
+                        <mat-icon>{{hideNewPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <mat-form-field class="w-full mb-2" appearance="fill">
+                    <mat-label>Repetir Nueva Contraseña</mat-label>
+                    <input matInput [type]="hideConfirmNewPassword() ? 'password' : 'text'"
+                        formControlName="confirmNewPassword" />
+                    @if (profileForm().get('newPassword')?.value !== profileForm().get('confirmNewPassword')?.value &&
+                    isPasswordChangeEnabled) {
+                    <mat-error>
+                        Las contraseñas no coinciden
+                    </mat-error>
+                    } @else if (profileForm().get('newPassword')?.value === '' && isPasswordChangeEnabled) {
+                    <mat-error>
+                        La contraseña es requerida
+                    </mat-error>
+                    }
+                    <mat-icon matPrefix>password</mat-icon>
+                    <button mat-icon-button matSuffix (click)="clickEventCNP($event)"
+                        [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hideConfirmNewPassword()"
+                        [disabled]="!isPasswordChangeEnabled">
+                        <mat-icon>{{hideConfirmNewPassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            }
+        </form>
+
+        <div class="flex flex-row items-center justify-center w-full">
+            <button mat-flat-button class="w-full rounded-lg" (click)="updateProfile()" [disabled]="isButtonDisabled()">
+                @if (!isPasswordChangeEnabled) {
+                Actualizar Perfil
+                } @else {
+                Actualizar Contraseña
+                }
+            </button>
+        </div>
+    </div>
+</div>

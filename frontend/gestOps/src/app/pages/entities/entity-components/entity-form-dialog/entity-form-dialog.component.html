@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>{{ mode === 'create' ? 'Crear Persona' : 'Actualizar Persona' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="entityForm()">
+    <div class="flex gap-4 flex-col">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Cuit</mat-label>
+        <input matInput formControlName="cuit" placeholder="Cuit" required>
+        @if (entityForm().get('cuit')?.hasError('pattern') && entityForm().get('cuit')?.touched) {
+          <mat-error>Ingresar cuit válido XXXXXXXXXXX</mat-error>
+        }
+
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Razón Social</mat-label>
+        <input matInput formControlName="razon_social" placeholder="Razón Social" required>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-button (click)="save()" [disabled]="entityForm().invalid">
+    {{ mode === 'create' ? 'Guardar' : 'Actualizar' }}
+  </button>
+</mat-dialog-actions>

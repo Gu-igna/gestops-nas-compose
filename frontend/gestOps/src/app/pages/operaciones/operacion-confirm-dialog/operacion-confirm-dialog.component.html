@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>Confirmar eliminación</h2>
+<mat-dialog-content>
+  ¿Está seguro de que desea eliminar esta operación?
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-button (click)="deleteOperacion()" cdkFocusInitial>Eliminar</button>
+</mat-dialog-actions>

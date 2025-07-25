@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>{{ mode === 'create' ? 'Crear Concepto' : 'Actualizar Concepto' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="conceptoForm()">
+    <div class="flex gap-4 flex-col">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Nombre" required>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-button (click)="save()" [disabled]="conceptoForm().invalid">
+    {{ mode === 'create' ? 'Guardar' : 'Actualizar' }}
+  </button>
+</mat-dialog-actions>

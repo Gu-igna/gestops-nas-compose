@@ -1,0 +1,209 @@
+<h2 mat-dialog-title class="!m-0 !pb-0">{{mode === 'create' ? 'Nueva Operación' : 'Editar Operación'}}</h2>
+
+<form [formGroup]="operacionForm" (ngSubmit)="onSubmit()" class="!h-full !flex !flex-col">
+  <div mat-dialog-content class="!flex-1 !overflow-auto !p-0 !max-h-none">
+    @if (loading) {
+    <div class="absolute inset-0 z-50 flex items-center justify-center bg-black/30">
+      <mat-progress-spinner color="primary" mode="indeterminate" diameter="120"></mat-progress-spinner>
+    </div>
+    }
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 pb-0 h-[calc(90vh-120px)]">
+      <!-- Fila 1: Fecha -->
+      <div>
+        <mat-form-field class="w-full">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fecha" required>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (operacionForm.get('fecha')?.hasError('required')) {
+          <mat-error>La fecha es requerida</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <div></div>
+      <div></div>
+
+      <!-- Fila 2: Tipo, Carácter, Naturaleza -->
+      <div>
+        <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Tipo*</label>
+        <mat-button-toggle-group formControlName="tipo" aria-label="Tipo de operación" class="flex">
+          <mat-button-toggle value="ingreso" class="flex-1">Ingreso</mat-button-toggle>
+          <mat-button-toggle value="egreso" class="flex-1">Egreso</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <div>
+        <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Carácter*</label>
+        <mat-button-toggle-group formControlName="caracter" aria-label="Carácter" class="flex">
+          <mat-button-toggle value="casa" class="flex-1">Casa</mat-button-toggle>
+          <mat-button-toggle value="oficina" class="flex-1">Oficina</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <div>
+        <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Naturaleza*</label>
+        <mat-button-toggle-group formControlName="naturaleza" aria-label="Naturaleza" class="flex">
+          <mat-button-toggle value="societario" class="flex-1">Societario</mat-button-toggle>
+          <mat-button-toggle value="personal" class="flex-1">Personal</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <!-- Fila 3: Subcategoría (3 columnas) -->
+      <mat-form-field appearance="fill" class="w-full md:col-span-3">
+        <mat-label>Subcategoría</mat-label>
+        <input type="text" matInput [formControl]="subcategoriaCtrl" [matAutocomplete]="autoSubcategoria"
+          (focus)="subcategoriaCtrl.setValue(subcategoriaCtrl.value || '')"> <mat-autocomplete
+          #autoSubcategoria="matAutocomplete" [displayWith]="getSubcategoriaDisplay">
+          @for (conceptoGroup of filteredSubcategorias | async; track conceptoGroup.nombre) {
+          <mat-optgroup [label]="conceptoGroup.nombre">
+            @for (categoryGroup of conceptoGroup.categorias; track categoryGroup.nombre) {
+            <mat-optgroup [label]="'  ' + categoryGroup.nombre">
+              @for (sub of categoryGroup.subcategorias; track sub.id) {
+              <mat-option [value]="sub" (onSelectionChange)="onSubcategoriaSelected(sub)">
+                {{ sub.nombre }}
+              </mat-option>
+              }
+            </mat-optgroup>
+            }
+          </mat-optgroup>
+          }
+        </mat-autocomplete>
+        @if (operacionForm.get('id_subcategoria')?.hasError('required') &&
+        operacionForm.get('id_subcategoria')?.touched) {
+        <mat-error>La subcategoría es requerida</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Fila 4: Persona  (3 columnas, con autocompletado) -->
+      <mat-form-field appearance="fill" class="w-full md:col-span-3">
+        <mat-label>Persona (Física/Jurídica)</mat-label>
+        <input type="text" matInput [formControl]="entidadCtrl" [matAutocomplete]="autoPersona"
+          (focus)="entidadCtrl.setValue(entidadCtrl.value || '')"> <mat-autocomplete #autoPersona="matAutocomplete"
+          [displayWith]="getEntidadDisplay">
+          @for (entity of filteredPersonas | async; track entity.id) {
+          <mat-option [value]="entity" (onSelectionChange)="onEntidadSelected(entity)">
+            {{ getEntidadDisplay(entity) }}
+          </mat-option>
+          }
+        </mat-autocomplete>
+        @if (operacionForm.get('id_persona')?.hasError('required') && operacionForm.get('id_persona')?.touched) {
+        <mat-error>La persona es requerida</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Fila 5: Tipo de Comprobante, Código, Monto -->
+      <div>
+        <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Tipo de Comprobante*</label>
+        <mat-button-toggle-group formControlName="option" aria-label="Tipo de Comprobante" class="flex">
+          <mat-button-toggle value="factura" class="flex-1">Factura</mat-button-toggle>
+          <mat-button-toggle value="boleta" class="flex-1">Boleta</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <mat-form-field appearance="fill" class="w-full mt-2 pt-0">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="codigo" required>
+        @if (operacionForm.get('codigo')?.hasError('required')) {
+        <mat-error>El código es requerido</mat-error>
+        }
+        @if (operacionForm.get('codigo')?.hasError('maxlength')) {
+        <mat-error>El código no puede tener más de 20 caracteres</mat-error>
+        }
+        @if (operacionForm.get('codigo')?.hasError('invalidFacturaCodigo')) {
+        <mat-error>El código de factura debe tener el formato "#####-########"</mat-error>
+        }
+        @if (operacionForm.get('codigo')?.hasError('invalidBoletaCodigo')) {
+        <mat-error>El código de boleta debe ser numérico</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="w-full mt-2 pt-0">
+        <mat-label>Monto Total</mat-label>
+        <input matInput type="number" formControlName="monto_total" required step="0.01">
+        @if (operacionForm.get('monto_total')?.hasError('required')) {
+        <mat-error>El monto total es requerido</mat-error>
+        }
+        @if (operacionForm.get('monto_total')?.hasError('min')) {
+        <mat-error>El monto debe ser mayor a 0.01</mat-error>
+        }
+        @if (operacionForm.get('monto_total')?.hasError('max')) {
+        <mat-error>El monto no puede ser mayor a 999999999.99</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Fila 6: Método de Pago (2 columnas) y Archivos Adjuntos (1 columna) -->
+      <div class="md:col-span-2 flex flex-col gap-4">
+        <div>
+          <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Método de Pago*</label>
+          <mat-button-toggle-group formControlName="metodo_de_pago" aria-label="Método de Pago" class="flex">
+            <mat-button-toggle value="efectivo" class="flex-1">Efectivo</mat-button-toggle>
+            <mat-button-toggle value="transferencia" class="flex-1">Transferencia</mat-button-toggle>
+            <mat-button-toggle value="mixto" class="flex-1">Mixto</mat-button-toggle>
+            <mat-button-toggle value="otro" class="flex-1">Otro</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <mat-form-field class="w-full h-40">
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput formControlName="observaciones" rows="3" style="resize: none"></textarea>
+          @if (operacionForm.get('observaciones')?.hasError('maxlength')) {
+          <mat-error>Las observaciones no pueden tener más de 255 caracteres</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <div class="h-56">
+        <div class="rounded-t-lg p-3 h-full flex flex-col border-b-1 border-b-neutral-800"
+          style="background: var(--mat-sys-surface-variant);">
+          <div class="flex justify-between items-center mb-0">
+            <h3 class="text-base" style="color: var(--mat-sys-on-surface-variant);">Archivos adjuntos</h3>
+            <span class="text-xs" style="color: var(--mat-sys-on-surface-variant);">Máx:
+              {{getValidationConfig().tamano_maximo_mb}}MB</span>
+          </div>
+          <div class="grid grid-cols-1 gap-2 flex-1">
+            @for (archivo of fileFields; track archivo.key) {
+            <div class="flex flex-col">
+              @if (fileErrors[archivo.key]) {
+              <button type="button" matRipple [matRippleColor]="'rgba(22,29,22,0.08)'"
+                class="flex items-center cursor-pointer border rounded-2xl py-1 hover:bg-red-100 active:bg-red-200"
+                style="border: 1px solid var(--mat-sys-error); background-color: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); font-weight: 500;"
+                (click)="clearFileError(archivo.key)">
+                <mat-icon class="ml-2 mr-2 animate-pulse">delete_forever</mat-icon>
+                <span class="text-xs text-red-600 ml-1 truncate mr-1">{{fileErrors[archivo.key]}}</span>
+              </button>
+              } @else {
+              <label matRipple [matRippleColor]="'rgba(22,29,22,0.08)'"
+                class="flex items-center cursor-pointer border rounded-2xl py-1 hover:bg-[#dce5d9] active:bg-[#d8e7d4]"
+                style="border: 1px solid var(--mat-sys-outline);" 
+                [ngStyle]="selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value ? {
+                  'background-color': 'var(--mat-sys-secondary-container)',
+                  'color': 'var(--mat-sys-on-secondary-container)'
+                } : {'background-color': 'var(--mat-sys-surface)'}">
+                <mat-icon class="ml-2 mr-2">
+                  {{ selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value ? 'check_circle' : 'attach_file' }}
+                </mat-icon>
+                <div class="flex-1 flex flex-row items-baseline min-w-0 mr-1">
+                  <span class="text-sm font-medium flex-shrink-0">{{ archivo.label }}:</span>
+                  @if (selectedFiles[archivo.key]) {
+                  <span class="text-xs opacity-75 ml-1 truncate">{{selectedFiles[archivo.key].name}}</span>
+                  <span
+                    class="text-xs opacity-75 ml-1 flex-shrink-0">({{formatFileSize(selectedFiles[archivo.key].size)}})</span>
+                  } @else if (operacionForm.get(archivo.key + '_path')?.value) {
+                  <span class="text-xs opacity-75 ml-1 truncate">{{ getFileNameFromPath(operacionForm.get(archivo.key + '_path')?.value) }}</span>
+                  } @else {
+                  <span class="text-xs opacity-75 ml-1 truncate">{{archivo.placeholder}}</span>
+                  }
+                </div>
+                <input type="file" [accept]="getAcceptString()" (change)="onFileSelected($event, archivo.key)"
+                  class="hidden" />
+              </label>
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="!flex !justify-end !gap-2 !p-3 !m-0 border-t !flex-shrink-0">
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-button color="primary" type="submit" [disabled]="!operacionForm.valid">
+      {{mode === 'create' ? 'Guardar' : 'Actualizar'}}
+    </button>
+  </div>
+</form>

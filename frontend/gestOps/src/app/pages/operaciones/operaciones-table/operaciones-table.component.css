@@ -1,0 +1,56 @@
+tr.operation-element-row:nth-child(4n), 
+tr.operation-element-row:nth-child(4n-1) {
+    background-color: var(--mat-sys-on-primary);
+}
+
+tr.operation-element-row:nth-child(4n-2),
+tr.operation-element-row:nth-child(4n-3) {
+    background-color: #F3F4F6; /* Tailwind gray-00 */
+}
+
+tr.operation-detail-row {
+    background-color: #edf5dd;
+}
+
+tr.operation-detail-row {
+    height: 0;
+}
+
+tr.operation-element-row {
+    cursor: pointer;
+}
+
+.operation-element-row td {
+    border-bottom-width: 0;
+}
+
+.operation-element-detail-wrapper {
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 0fr;
+    grid-template-columns: 100%;
+    transition: grid-template-rows 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.operation-element-detail-wrapper-expanded {
+    grid-template-rows: 1fr;
+}
+
+.operation-element-detail {
+    display: flex;
+    min-height: 0;
+}
+
+.operation-toggle-button {
+    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.operation-toggle-button-expanded {
+    transform: rotate(180deg);
+}
+
+/* Ancho específico para la columna fecha usando valores de Tailwind */
+.mat-column-fecha {
+width: 7rem; /* w-28 en Tailwind = 112px = 7rem */
+  min-width: 7rem;
+}

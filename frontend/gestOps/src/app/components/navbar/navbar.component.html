@@ -1,0 +1,24 @@
+<div>
+    <nav class="fixed w-full flex flex-row bg-white shadow-md">
+
+        <nav mat-tab-nav-bar class="basis-5/6 bg-white" [tabPanel]="tabPanel">
+            @for (route of mainRoutes; track $index) {
+            <a mat-tab-link [routerLink]="'/' + route.path" routerLinkActive #rla="routerLinkActive"
+                [active]="rla.isActive" class="text-lg">
+                <mat-icon>{{route.icon}}</mat-icon>
+                <span class="ml-2">{{route.label}}</span>
+            </a>
+            }
+        </nav>
+
+        <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+
+        <div class="basis-1/6 flex items-center justify-center bg-white">
+            <button mat-button (click)="logout()" class="text-lg">
+                <mat-icon class="text-[26px] h-[26px] w-[26px]">logout</mat-icon>
+                Cerrar sesión
+            </button>
+        </div>
+    </nav>
+    <div class="pt-12"></div>
+</div>

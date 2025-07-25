@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>{{ mode === 'create' ? 'Crear subcategoria' : 'Actualizar subcategoria' }}</h2>
+<mat-dialog-content>
+    <form [formGroup]="subCategoriaForm()">
+        <div class="flex gap-4 flex-col">
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" placeholder="Nombre" required>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="w-full">
+                <mat-label>Concepto</mat-label>
+                <input type="text" placeholder="Seleccione un concepto" aria-label="Concepto" matInput
+                    formControlName="conceptoText" [matAutocomplete]="autoConcepto" required>
+                @if (subCategoriaForm().get('id_concepto')!.hasError('idConceptoInvalido')) {
+                <mat-error>Debe seleccionar un concepto válido del listado</mat-error>
+                }
+                <mat-autocomplete #autoConcepto="matAutocomplete" [displayWith]="displayConceptoFn">
+                    @for (concepto of conceptos(); track concepto.id) {
+                    <mat-option [value]="concepto">{{ concepto.nombre }}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="w-full">
+                <mat-label>Categoría</mat-label>
+                <input type="text" placeholder="Seleccione una categoría" aria-label="Categoria" matInput
+                    formControlName="categoriaText" [matAutocomplete]="autoCategoria" required
+                    [disabled]="!selectedConceptoId()">
+                @if (subCategoriaForm().get('id_categoria')!.hasError('idCategoriaInvalida')) {
+                <mat-error>Debe seleccionar una categoría válida del listado</mat-error>
+                }
+                <mat-autocomplete #autoCategoria="matAutocomplete" [displayWith]="displayCategoriaFn">
+                    @for (categoria of filteredCategorias(); track categoria.id) {
+                    <mat-option [value]="categoria">{{ categoria.nombre }}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button type="button" (click)="cancel()">Cancelar</button>
+    <button mat-button (click)="save()" [disabled]="subCategoriaForm().invalid">
+        {{ mode === 'create' ? 'Guardar' : 'Actualizar' }}
+    </button>
+</mat-dialog-actions>

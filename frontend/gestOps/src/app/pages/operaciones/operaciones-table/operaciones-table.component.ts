@@ -228,12 +228,15 @@ export class OperacionesTableComponent implements AfterViewInit {
     this.totalGeneral = this.totalIngresos - this.totalEgresos;
   }
 
-  // Función para formatear números con separador de miles
   formatNumber(num: number): string {
     return num.toLocaleString('es-AR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+      })
+      .replace(/\./g, '#')
+      .replace(/,/g, '.')
+      .replace(/#/g, ' ');
   }
 
   isExpanded(element: Operation): boolean {

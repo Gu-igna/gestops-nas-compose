@@ -156,8 +156,8 @@
                                         <p class="mt-2.5">Comprobante:</p>
                                         @if (element.comprobante_path) {
                                         <button mat-button
-                                            (click)="openFileViewer(element.comprobante_path, 'Comprobante', element.id)">
-                                            <mat-icon class="align-middle mr-1">picture_as_pdf</mat-icon>
+                                            (click)="openFileViewer(element.comprobante_path, 'Comprobante', 'document', element.id)">
+                                            <mat-icon class="align-middle mr-1">description</mat-icon>
                                             Ver archivo
                                         </button>
                                         } @else {

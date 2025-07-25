@@ -5,7 +5,7 @@
 
     <form [formGroup]="loginForm()">
 
-      <div class="mb-1">
+      <div>
 
         <mat-form-field class="w-full mb-3" appearance="fill">
           <mat-label>Correo electrónico</mat-label>
@@ -16,7 +16,6 @@
           <mat-icon matPrefix>mail</mat-icon>
         </mat-form-field>
 
-
         <mat-form-field class="w-full" appearance="fill">
           <mat-label>Contraseña</mat-label>
           <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password"/>
@@ -26,18 +25,22 @@
             <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
         </mat-form-field>
-
       </div>
 
     </form>
-
-    <button class="mb-5 w-full text-left cursor-pointer hover:underline active:text-yellow-900"
+    <div class="h-4 mb-4">
+      @if (loginError()) {
+      <mat-error class="m-0">
+        <mat-icon class="mr-1 align-middle">warning</mat-icon>
+        {{ loginError() }}</mat-error>
+      }
+    </div>
+    <button class="mb-2 w-full text-left cursor-pointer hover:underline active:text-yellow-900"
     (click)="resetpassword()" style="color: var(--mat-sys-primary)">
       Recuperar Contraseña
     </button>
 
     <button mat-flat-button class="w-full rounded-lg" (click)="onSubmit()">Ingresar</button>
-
   </div>
 </div>
 

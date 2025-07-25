@@ -44,6 +44,8 @@ export class LoginComponent {
   matcher = new MyErrorStateMatcher();
   hide = signal(true);
 
+  loginError = signal('');
+
   constructor(private authService: AuthService, private router: Router) {}
 
   clickEvent(event: MouseEvent) {
@@ -68,10 +70,12 @@ export class LoginComponent {
           console.log('Login exitoso:', response);
         },
         error: (err) => {
+          this.loginError.set('Credenciales inválidas. Intente nuevamente.');
           console.error('Error en login:', err);
         },
       });
     } else {
+      this.loginError.set('Formulario inválido');
       console.error('Formulario inválido');
     }
   }

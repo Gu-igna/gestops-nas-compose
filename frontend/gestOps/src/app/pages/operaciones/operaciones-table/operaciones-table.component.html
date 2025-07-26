@@ -29,101 +29,15 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-2 m-0">
-
-            <mat-form-field class="w-[78px] text-xs h-[65px]">
-                <mat-label class="text-xs">Id</mat-label>
-                <input matInput [(ngModel)]="filtroId" (input)="applyFilter('id', $any($event.target).value)"
-                    placeholder="ID">
-            </mat-form-field>
-
-            <mat-form-field class="w-[104px] text-xs h-[65px]">
-                <mat-label class="text-xs">Fecha</mat-label>
-                <input matInput [(ngModel)]="filtroFecha" (input)="applyFilter('fecha', $any($event.target).value)"
-                    placeholder="YYYY-MM-DD">
-            </mat-form-field>
-
-            <mat-form-field class="w-[79px] text-xs h-[65px]">
-                <mat-label class="text-xs">Tipo</mat-label>
-                <input matInput [(ngModel)]="filtroTipo" (input)="applyFilter('tipo', $any($event.target).value)"
-                    placeholder="ing/egr">
-            </mat-form-field>
-
-            <mat-form-field class="w-[96px] text-xs h-[65px]">
-                <mat-label class="text-xs">Carácter</mat-label>
-                <input matInput [(ngModel)]="filtroCaracter"
-                    (input)="applyFilter('caracter', $any($event.target).value)" placeholder="casa/ofic">
-            </mat-form-field>
-
-            <mat-form-field class="w-[110px] text-xs h-[65px]">
-                <mat-label class="text-xs">Naturaleza</mat-label>
-                <input matInput [(ngModel)]="filtroNaturaleza"
-                    (input)="applyFilter('naturaleza', $any($event.target).value)" placeholder="débito/créd">
-            </mat-form-field>
-
-            <mat-form-field class="w-[164px] text-xs h-[65px]">
-                <mat-label class="text-xs">Concepto</mat-label>
-                <input matInput [(ngModel)]="filtroConcepto"
-                    (input)="applyFilter('concepto', $any($event.target).value)" placeholder="Concepto">
-            </mat-form-field>
-
-            <mat-form-field class="w-[126px] text-xs h-[65px]">
-                <mat-label class="text-xs">Categoría</mat-label>
-                <input matInput [(ngModel)]="filtroCategoria"
-                    (input)="applyFilter('categoria', $any($event.target).value)" placeholder="Categoría">
-            </mat-form-field>
-
-            <mat-form-field class="w-[180px] text-xs h-[65px]">
-                <mat-label class="text-xs">Subcategoría</mat-label>
-                <input matInput [(ngModel)]="filtroSubcategoria"
-                    (input)="applyFilter('subcategoria', $any($event.target).value)" placeholder="Subcategoría">
-            </mat-form-field>
-
-            <mat-form-field class="w-[130px] text-xs h-[65px]">
-                <mat-label class="text-xs">Razón social</mat-label>
-                <input matInput [(ngModel)]="filtroPersona" (input)="applyFilter('persona', $any($event.target).value)"
-                    placeholder="Razón social">
-            </mat-form-field>
-
-            <mat-form-field class="w-[120px] text-xs h-[65px]">
-                <mat-label class="text-xs">Cuit</mat-label>
-                <input matInput [(ngModel)]="filtroCuit" (input)="applyFilter('cuit', $any($event.target).value)"
-                    placeholder="CUIT">
-            </mat-form-field>
-
-            <mat-form-field class="w-[130px] text-xs h-[65px]">
-                <mat-label class="text-xs">Comprobante</mat-label>
-                <input matInput [(ngModel)]="filtroOption" (input)="applyFilter('option', $any($event.target).value)"
-                    placeholder="T. comprobante">
-            </mat-form-field>
-
-            <mat-form-field class="w-[150px] text-xs h-[65px]">
-                <mat-label class="text-xs">Núm comprobante</mat-label>
-                <input matInput [(ngModel)]="filtroCodigo" (input)="applyFilter('codigo', $any($event.target).value)"
-                    placeholder="Núm comprobante">
-            </mat-form-field>
-
-            <mat-form-field class="w-[132px] text-xs h-[65px]">
-                <mat-label class="text-xs" class="text-xs">Importe</mat-label>
-                <input matInput [(ngModel)]="filtroMonto" (input)="applyFilter('monto', $any($event.target).value)"
-                    placeholder="Importe">
-            </mat-form-field>
-
-            <mat-form-field class="w-[112px] text-xs h-[65px]">
-                <mat-label class="text-xs">Usuario</mat-label>
-                <input matInput [(ngModel)]="filtroUsuario" (input)="applyFilter('usuario', $any($event.target).value)"
-                    placeholder="Usuario">
-            </mat-form-field>
-        </div>
-
-
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort
-                class="border-1 border-gray-500 table-fixed">
+                class="border border-gray-500 table-fixed">
+
                 @for (column of columnsToDisplay; track column) {
                 <ng-container matColumnDef="{{column}}">
                     <th mat-header-cell *matHeaderCellDef [class]="headerColor" mat-sort-header
-                        [ngClass]="getColumnWidthClass(column)"> {{column === 'subcategoria' ? 'Subcategoría' :
+                        [ngClass]="getColumnWidthClass(column) + ' no-padding'">
+                        {{column === 'subcategoria' ? 'Subcategoría' :
                         column === 'categoria' ? 'Categoría' :
                         column === 'razon_social' ? 'Razón social' :
                         column === 'option' ? 'Tipo de comprobante' :
@@ -131,14 +45,222 @@
                         column === 'monto_total' ? 'Importe' :
                         (column | titlecase).split('_').join(' ')}}
                     </th>
-                    <td mat-cell *matCellDef="let element" [ngClass]="getColumnWidthClass(column)"> {{element[column]}}
+
+                    <td mat-cell *matCellDef="let element" [ngClass]="getColumnWidthClass(column) + ' no-padding'">
+                        {{element[column]}}
                     </td>
                 </ng-container>
                 }
+
+                @for (column of columnsToDisplay; track column) {
+                <ng-container matColumnDef="{{column}}-filter">
+                    <th mat-header-cell *matHeaderCellDef [ngClass]="getColumnWidthClass(column)"
+                        class="bg-[#ffffff] border-b border-gray-500 p-1 filter-cell">
+
+                        @if (column === 'id') {
+                        <div class="relative w-[86px]">
+                            <input type="text" id="filtro_id"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroId"
+                                (input)="applyFilter('id', $any($event.target).value)" />
+                            <label for="filtro_id"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'fecha') {
+                        <div class="relative w-[104px]">
+                            <input type="text" id="filtro_fecha"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroFecha"
+                                (input)="applyFilter('fecha', $any($event.target).value)" />
+                            <label for="filtro_fecha"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'tipo') {
+                        <div class="relative w-[86px]">
+                            <input type="text" id="filtro_tipo"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroTipo"
+                                (input)="applyFilter('tipo', $any($event.target).value)" />
+                            <label for="filtro_tipo"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'caracter') {
+                        <div class="relative w-[86px]">
+                            <input type="text" id="filtro_caracter"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroCaracter"
+                                (input)="applyFilter('caracter', $any($event.target).value)" />
+                            <label for="filtro_caracter"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'naturaleza') {
+                        <div class="relative w-[104px]">
+                            <input type="text" id="filtro_naturaleza"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroNaturaleza"
+                                (input)="applyFilter('naturaleza', $any($event.target).value)" />
+                            <label for="filtro_naturaleza"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'concepto') {
+                        <div class="relative w-[104px]">
+                            <input type="text" id="filtro_concepto"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroConcepto"
+                                (input)="applyFilter('concepto', $any($event.target).value)" />
+                            <label for="filtro_concepto"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'categoria') {
+                        <div class="relative w-[164px]">
+                            <input type="text" id="filtro_categoria"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroCategoria"
+                                (input)="applyFilter('categoria', $any($event.target).value)" />
+                            <label for="filtro_categoria"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'subcategoria') {
+                        <div class="relative w-[164px]">
+                            <input type="text" id="filtro_subcategoria"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroSubcategoria"
+                                (input)="applyFilter('subcategoria', $any($event.target).value)" />
+                            <label for="filtro_subcategoria"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'razon_social') {
+                        <div class="relative w-[136px]">
+                            <input type="text" id="filtro_razon_social"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroPersona"
+                                (input)="applyFilter('persona', $any($event.target).value)" />
+                            <label for="filtro_razon_social"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'cuit') {
+                        <div class="relative w-[112px]">
+                            <input type="text" id="filtro_cuit"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroCuit"
+                                (input)="applyFilter('cuit', $any($event.target).value)" />
+                            <label for="filtro_cuit"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'option') {
+                        <div class="relative w-[108px]">
+                            <input type="text" id="filtro_option"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroOption"
+                                (input)="applyFilter('option', $any($event.target).value)" />
+                            <label for="filtro_option"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'codigo') {
+                        <div class="relative w-[156px]">
+                            <input type="text" id="filtro_codigo"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroCodigo"
+                                (input)="applyFilter('codigo', $any($event.target).value)" />
+                            <label for="filtro_codigo"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'monto_total') {
+                        <div class="relative w-[122px]">
+                            <input type="text" id="filtro_monto_total"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroMonto"
+                                (input)="applyFilter('monto', $any($event.target).value)" />
+                            <label for="filtro_monto_total"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                        @if (column === 'usuario') {
+                        <div class="relative w-[104px]">
+                            <input type="text" id="filtro_usuario"
+                                class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
+                                placeholder=" "
+                                [(ngModel)]="filtroUsuario"
+                                (input)="applyFilter('usuario', $any($event.target).value)" />
+                            <label for="filtro_usuario"
+                                class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
+                                Buscar...
+                            </label>
+                        </div>
+                        }
+
+                    </th>
+                </ng-container>
+                }
+
                 <ng-container matColumnDef="expand">
                     <th mat-header-cell *matHeaderCellDef aria-label="row actions" [class]="headerColor"
-                        class="w-[73px]">&nbsp;</th>
-                    <td mat-cell *matCellDef="let element">
+                        class="w-[73px] no-padding">&nbsp;</th>
+                    <td mat-cell *matCellDef="let element" class="no-padding">
                         <button mat-icon-button aria-label="expand row"
                             (click)="toggle(element); $event.stopPropagation()" class="operation-toggle-button"
                             [class.operation-toggle-button-expanded]="isExpanded(element)">
@@ -146,6 +268,14 @@
                         </button>
                     </td>
                 </ng-container>
+
+                <ng-container matColumnDef="expand-filter">
+                    <th mat-header-cell *matHeaderCellDef
+                        class="w-[73px] bg-gray-50 border-b border-gray-200 no-padding filter-cell">
+                        &nbsp;
+                    </th>
+                </ng-container>
+
                 <ng-container matColumnDef="expandedDetail">
                     <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpand.length">
                         <div class="operation-element-detail-wrapper"
@@ -244,7 +374,11 @@
                         </div>
                     </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
+
+                <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand; sticky: false"></tr>
+
+                <tr mat-header-row *matHeaderRowDef="filterColumns; sticky: false" class="bg-gray-50"></tr>
+
                 <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand;" class="operation-element-row"
                     [class.operation-expanded-row]="isExpanded(element)" (click)="toggle(element)">
                 </tr>

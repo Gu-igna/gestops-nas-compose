@@ -49,8 +49,17 @@ tr.operation-element-row {
     transform: rotate(180deg);
 }
 
-/* Ancho específico para la columna fecha usando valores de Tailwind */
-.mat-column-fecha {
-width: 7rem; /* w-28 en Tailwind = 112px = 7rem */
-  min-width: 7rem;
+.no-padding {
+    padding-right: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+.no-margin.mat-mdc-form-field {
+    margin: 0 !important;
+}
+
+.filter-cell {
+    padding-left: 4px;
+    padding-right: 4px;
 }

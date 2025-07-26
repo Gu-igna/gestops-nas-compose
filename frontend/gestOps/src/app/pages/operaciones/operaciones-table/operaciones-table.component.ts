@@ -72,6 +72,9 @@ export class OperacionesTableComponent implements AfterViewInit {
     'razon_social', 'cuit', 'option', 'codigo', 'monto_total', 'usuario'
   ];
   columnsToDisplayWithExpand = [...this.columnsToDisplay, 'expand'];
+
+  filterColumns: string[] = [...this.columnsToDisplay.map(col => col + '-filter'), 'expand-filter'];
+
   expandedColumns = ['comprobante_path',
     'archivo1_path', 'archivo2_path', 'archivo3_path',
     'metodo_de_pago', 'modificado_por_otro',
@@ -79,20 +82,20 @@ export class OperacionesTableComponent implements AfterViewInit {
   ];
 
   columnWidths: { [key: string]: string } = {
-    id: 'w-[80px]',
-    fecha: 'w-[112px]',
-    tipo: 'w-[84px]',
-    caracter: 'w-[104px]',
-    naturaleza: 'w-[118px]',
-    concepto: 'w-[180px]',
-    categoria: 'w-[140px]',
-    subcategoria: 'w-[200px]',
-    razon_social: 'w-[140px]',
-    cuit: 'w-[132px]',
-    option: 'w-[130px]',
-    codigo: 'w-[160px]',
-    monto_total: 'w-[152px]',
-    usuario: 'w-[99px]',
+    id: 'w-[86px]',
+    fecha: 'w-[104px]',
+    tipo: 'w-[86px]',
+    caracter: 'w-[86px]',
+    naturaleza: 'w-[104px]',
+    concepto: 'w-[104px]',
+    categoria: 'w-[164px]',
+    subcategoria: 'w-[164px]',
+    razon_social: 'w-[136px]',
+    cuit: 'w-[112px]',
+    option: 'w-[108px]',
+    codigo: 'w-[156px]',
+    monto_total: 'w-[122px]',
+    usuario: 'w-[104px]',
   };
 
   expandedElement: Operation | null = null;
@@ -230,10 +233,10 @@ export class OperacionesTableComponent implements AfterViewInit {
 
   formatNumber(num: number): string {
     return num.toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        useGrouping: true
-      })
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      useGrouping: true
+    })
       .replace(/\./g, '#')
       .replace(/,/g, '.')
       .replace(/#/g, ' ');

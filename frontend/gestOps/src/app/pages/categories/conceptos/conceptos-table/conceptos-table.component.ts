@@ -61,7 +61,7 @@ export class ConceptosTableComponent implements AfterViewInit {
   openConceptoFormDialog(mode: 'create' | 'update', concepto?: Concepto) {
     const dialogRef = this.dialog.open(ConceptoFormDialogComponent, {
       width: '400px',
-      height: '220px',
+      height: '238px',
       data: {
         mode: mode,
         concepto: concepto

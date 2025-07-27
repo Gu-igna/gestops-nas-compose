@@ -57,8 +57,7 @@ export interface Operacion {
     CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatDatepickerModule,
     MatButtonToggleModule, MatIconModule, MatAutocompleteModule,
-    MatRippleModule, MatProgressSpinnerModule,
-    FechaConfirmDialogComponent // Add FechaConfirmDialogComponent to imports
+    MatRippleModule, MatProgressSpinnerModule
   ],
   providers: [
     provideNativeDateAdapter(),

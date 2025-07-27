@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
@@ -17,7 +18,7 @@ import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-concepto-form-dialog',
-  imports: [MatDialogModule, MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule],
+  imports: [MatDialogModule, MatButtonModule, MatIcon, MatButtonToggleModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './concepto-form-dialog.component.html',
   styleUrl: './concepto-form-dialog.component.css'
@@ -26,6 +27,8 @@ export class ConceptoFormDialogComponent {
   readonly dialogRef = inject(MatDialogRef<ConceptoFormDialogComponent>);
   mode: 'create' | 'update';
 
+  conceptoExistsError = false;
+
   conceptoForm = signal(
     new FormGroup({
       id: new FormControl(0, { nonNullable: true }),
@@ -33,6 +36,7 @@ export class ConceptoFormDialogComponent {
     })
   );
 
+  cdr = inject(ChangeDetectorRef);
   constructor(
     private conceptosService: ConceptosService,
   ) {
@@ -63,8 +67,15 @@ export class ConceptoFormDialogComponent {
                 NewConcepto: NewConcepto
               });
             },
-            error: (error: unknown) => {
-              console.error('Creation failed:', error);
+            error: (error) => {
+              if (error && (error.status === 409 || (error.message && error.message.includes('409')))) {
+                this.conceptoExistsError = true;
+                this.cdr.detectChanges();
+              } else {
+                this.conceptoExistsError = false;
+                this.cdr.detectChanges();
+                console.error('Creation failed:', error);
+              }
             }
           });
         } else {

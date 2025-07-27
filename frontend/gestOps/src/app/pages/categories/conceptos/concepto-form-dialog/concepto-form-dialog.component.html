@@ -1,11 +1,18 @@
 <h2 mat-dialog-title>{{ mode === 'create' ? 'Crear Concepto' : 'Actualizar Concepto' }}</h2>
 <mat-dialog-content>
   <form [formGroup]="conceptoForm()">
-    <div class="flex gap-4 flex-col">
+    <div class="flex flex-col">
       <mat-form-field appearance="fill" class="w-full">
         <mat-label>Nombre</mat-label>
         <input matInput formControlName="nombre" placeholder="Nombre" required>
       </mat-form-field>
+    </div>
+    <div class="h-4 m-0 flex justify-center items-center">
+      @if (conceptoExistsError) {
+      <mat-error>
+        <mat-icon class="mr-1 align-middle">warning</mat-icon> El concepto ya existe
+      </mat-error>
+      }
     </div>
   </form>
 </mat-dialog-content>

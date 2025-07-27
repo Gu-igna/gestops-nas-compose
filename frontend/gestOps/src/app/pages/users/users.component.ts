@@ -64,7 +64,7 @@ export class UsersComponent implements AfterViewInit {
   openUserFormDialog(mode: 'create' | 'update', user?: User) {
     const dialogRef = this.dialog.open(UserFormDialogComponent, {
       width: '400px',
-      height: '335px',
+      height: '380px',
       data: {
         mode: mode,
         user: user

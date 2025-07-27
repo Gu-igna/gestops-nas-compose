@@ -8,7 +8,7 @@ class Operacion(db.Model):
     CARACTERES_PERMITIDOS = ['casa', 'oficina']
     NATURALEZAS_PERMITIDAS = ['societario', 'personal']
     OPTIONS_PERMITIDAS = ['factura', 'boleta']
-    METODOS_PAGO_PERMITIDOS = ['efectivo', 'transferencia', 'mixto', 'otro']
+    METODOS_PAGO_PERMITIDOS = ['efectivo', 'debito', 'transferencia', 'mixto', 'otro']
 
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

@@ -10,7 +10,7 @@ def role_required(roles):
             if claims['rol'] in roles:
                 return fn(*args, **kwargs)
             else:
-                return jsonify({"msg": "Rol sin permisos de acceso al recurso"}), 403
+                return {"message": "Rol sin permisos de acceso al recurso"}, 403
         return wrapper
     return decorator
 

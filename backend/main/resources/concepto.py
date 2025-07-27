@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask import request
 from .. import db
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from main.models import ConceptoModel
 from main.auth.decorators import role_required
 
@@ -34,12 +35,25 @@ class Concepto(Resource):
             concepto = db.session.query(ConceptoModel).get_or_404(id)
             data = request.get_json()
 
+            if not data:
+                return {'message': 'No se recibieron datos para actualizar'}, 400
+
+            if 'nombre' in data and data['nombre'] != concepto.nombre:
+                if db.session.query(ConceptoModel).filter(ConceptoModel.nombre == data['nombre'], ConceptoModel.id != id).first():
+                    return {'message': f'Ya existe otro concepto con el nombre "{data["nombre"]}".'}, 409
+
             for key, value in data.items():
                 setattr(concepto, key, value)
 
             db.session.add(concepto)
             db.session.commit()
             return concepto.to_json(), 200
+        except ValueError as ve:
+            db.session.rollback()
+            return {'message': str(ve)}, 400
+        except IntegrityError:
+            db.session.rollback()
+            return {'message': 'Error de integridad de datos: Ya existe un concepto con ese nombre o hay otro problema de unicidad.'}, 409
         except Exception as e:
             db.session.rollback()
             return {'message': f'Error al actualizar concepto: {str(e)}'}, 500
@@ -100,22 +114,25 @@ class Conceptos(Resource):
             data = request.get_json()
             if not data:
                 return {'message': 'No se recibieron datos'}, 400
-            
+
             if 'nombre' not in data:
                 return {'message': 'Falta el nombre del concepto'}, 400
-            
+
             if db.session.query(ConceptoModel).filter(ConceptoModel.nombre == data['nombre']).first():
-                return {'message': 'Ya existe un concepto con ese nombre'}, 400
+                return {'message': 'Ya existe un concepto con ese nombre'}, 409
 
             new_concepto = ConceptoModel.from_json(data)
             db.session.add(new_concepto)
             db.session.commit()
 
             return new_concepto.to_json(), 201
-        
+
         except ValueError as ve:
+            db.session.rollback()
             return {'message': str(ve)}, 400
-        
+        except IntegrityError:
+            db.session.rollback()
+            return {'message': 'Error de integridad de datos: Ya existe un concepto con ese nombre.'}, 409
         except Exception as e:
             db.session.rollback()
             return {'message': 'Error al crear el concepto', 'error': str(e)}, 500

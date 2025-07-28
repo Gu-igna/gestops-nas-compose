@@ -1,21 +1,22 @@
-import { ChangeDetectionStrategy, Component, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatIcon } from '@angular/material/icon';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { EntitiesService } from '../../../../services/entities/entities.service';
+import { SnackbarService } from '../../../../services/snackbar/snackbar.service';
 
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-entity-form-dialog',
-  imports: [MatDialogModule, MatButtonModule, MatButtonToggleModule, MatIcon, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatProgressSpinnerModule],
+  imports: [MatDialogModule, MatButtonModule, MatButtonToggleModule, MatSnackBarModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatProgressSpinnerModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './entity-form-dialog.component.html',
   styleUrl: './entity-form-dialog.component.css'
@@ -23,8 +24,6 @@ import { FormControl, Validators } from '@angular/forms';
 export class EntityFormDialogComponent {
   readonly dialogRef = inject(MatDialogRef<EntityFormDialogComponent>);
   mode: 'create' | 'update';
-  
-  cuitExistsError = false;
 
   entityForm = signal(
     new FormGroup({
@@ -34,9 +33,9 @@ export class EntityFormDialogComponent {
     })
   );
 
-  cdr = inject(ChangeDetectorRef);
   constructor(
-    private entitiesService: EntitiesService
+    private entitiesService: EntitiesService,
+    private snackbarService: SnackbarService
   ) {
     const data = inject(MAT_DIALOG_DATA) as { mode: 'create' | 'update', entity?: Entity };
     this.mode = data.mode;
@@ -60,8 +59,6 @@ export class EntityFormDialogComponent {
         const { id, ...rest } = entityData;
         this.entitiesService.createEntity(rest).subscribe({
           next: (NewEntity: NewEntity) => {
-            this.cuitExistsError = false;
-            this.cdr.detectChanges();
             this.dialogRef.close({
               mode: this.mode,
               newEntity: NewEntity
@@ -70,12 +67,7 @@ export class EntityFormDialogComponent {
           error: (error) => {
             console.error('Creation failed:', error);
             if (error && (error.status === 409 || (error.message && error.message.includes('409')))) {
-              this.cuitExistsError = true;
-              this.cdr.detectChanges();
-            } else {
-              this.cuitExistsError = false;
-              this.cdr.detectChanges();
-              console.error('Unexpected error:', error);
+              this.snackbarService.showWarning('Cuit ya registrado.');
             }
           }
         });

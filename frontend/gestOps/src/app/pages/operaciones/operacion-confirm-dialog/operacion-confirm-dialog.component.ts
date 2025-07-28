@@ -19,27 +19,50 @@ import { OperacionesService } from '../../../services/operaciones/operaciones.se
   templateUrl: './operacion-confirm-dialog.component.html',
   styleUrl: './operacion-confirm-dialog.component.css'
 })
+
 export class OperacionConfirmDialogComponent {
   readonly dialogRef = inject(MatDialogRef<OperacionConfirmDialogComponent>);
-
-  private operacionId: number;
-
+  public tipo: 'operacion' | 'archivo';
+  public id: number;
+  public path?: string;
+  private dialogData: { tipo: 'operacion' | 'archivo', id: number, path?: string };
 
   constructor(private operacionesService: OperacionesService) {
-    const data = inject(MAT_DIALOG_DATA) as { operationId: number };
-    this.operacionId = data.operationId;
+    this.dialogData = inject(MAT_DIALOG_DATA) as { tipo: 'operacion' | 'archivo', id: number, path?: string };
+    this.tipo = this.dialogData.tipo;
+    this.id = this.dialogData.id;
+    this.path = this.dialogData.path;
   }
 
   deleteOperacion() {
-    this.operacionesService.deleteOperacion(this.operacionId).subscribe({
-      next: () => {
-        console.log(`Operación ${this.operacionId} eliminada`);
-        this.dialogRef.close(true);
-      },
-      error: (error) => {
-        console.error('Error al eliminar operación:', error);
+    if (this.tipo === 'operacion') {
+      this.operacionesService.deleteOperacion(this.id).subscribe({
+        next: () => {
+          console.log(`Operación ${this.id} eliminada`);
+          this.dialogRef.close(true);
+        },
+        error: (error) => {
+          console.error('Error al eliminar operación:', error);
+          this.dialogRef.close(false);
+        }
+      });
+    } else if (this.tipo === 'archivo') {
+      const path = this.path;
+      if (!path) {
+        console.error('No se proporcionó la clave del archivo.');
         this.dialogRef.close(false);
+        return;
       }
-    });
+      this.operacionesService.deleteArchivo(this.id, path).subscribe({
+        next: () => {
+          console.log(`Archivo ${this.id} con clave ${path} eliminado`);
+          this.dialogRef.close(true);
+        },
+        error: (error) => {
+          console.error('Error al eliminar archivo:', error);
+          this.dialogRef.close(false);
+        }
+      });
+    }
   }
 }

@@ -147,52 +147,74 @@
           }
         </mat-form-field>
       </div>
+      <!-- Sección de archivos adjuntos -->
       <div class="h-56">
+        <!-- Contenedor principal de archivos adjuntos -->
         <div class="rounded-t-lg p-3 h-full flex flex-col border-b-1 border-b-neutral-800"
           style="background: var(--mat-sys-surface-variant);">
+          <!-- Título y límite de tamaño de archivo -->
           <div class="flex justify-between items-center mb-0">
             <h3 class="text-base" style="color: var(--mat-sys-on-surface-variant);">Archivos adjuntos</h3>
             <span class="text-xs" style="color: var(--mat-sys-on-surface-variant);">Máx:
               {{getValidationConfig().tamano_maximo_mb}}MB</span>
           </div>
+          <!-- Lista de campos de archivos -->
           <div class="grid grid-cols-1 gap-2 flex-1">
+            <!-- Itera sobre cada campo de archivo -->
             @for (archivo of fileFields; track archivo.key) {
-            <div class="flex flex-col">
+            <div class="flex items-center">
+              <!-- Si hay error en el archivo, muestra botón para limpiar el error -->
               @if (fileErrors[archivo.key]) {
               <button type="button" matRipple [matRippleColor]="'rgba(22,29,22,0.08)'"
-                class="flex items-center cursor-pointer border rounded-2xl py-1 hover:bg-red-100 active:bg-red-200"
+                class="flex items-center cursor-pointer border rounded-2xl py-1 hover:bg-red-100 active:bg-red-200 flex-1"
                 style="border: 1px solid var(--mat-sys-error); background-color: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); font-weight: 500;"
                 (click)="clearFileError(archivo.key)">
                 <mat-icon class="ml-2 mr-2 animate-pulse">delete_forever</mat-icon>
-                <span class="text-xs text-red-600 ml-1 truncate mr-1">{{fileErrors[archivo.key]}}</span>
+                <span class="text-md text-red-600 ml-1 truncate mr-1">{{fileErrors[archivo.key]}}</span>
               </button>
-              } @else {
+              }
+              <!-- Si no hay error, muestra el campo para seleccionar archivo -->
+              @else {
               <label matRipple [matRippleColor]="'rgba(22,29,22,0.08)'"
-                class="flex items-center cursor-pointer border rounded-2xl py-1 hover:bg-[#dce5d9] active:bg-[#d8e7d4]"
-                style="border: 1px solid var(--mat-sys-outline);" 
-                [ngStyle]="selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value ? {
-                  'background-color': 'var(--mat-sys-secondary-container)',
-                  'color': 'var(--mat-sys-on-secondary-container)'
-                } : {'background-color': 'var(--mat-sys-surface)'}">
+                class="flex items-center cursor-pointer border rounded-2xl py-1 hover:bg-[#dce5d9] active:bg-[#d8e7d4] flex-1"
+                style="border: 1px solid var(--mat-sys-outline);" [ngStyle]="selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value ? {
+          'background-color': 'var(--mat-sys-secondary-container)',
+          'color': 'var(--mat-sys-on-secondary-container)'
+            } : {'background-color': 'var(--mat-sys-surface)'}">
+                <!-- Icono de estado del archivo -->
                 <mat-icon class="ml-2 mr-2">
-                  {{ selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value ? 'check_circle' : 'attach_file' }}
+                  {{ selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value ? 'check_circle' :
+                  'attach_file' }}
                 </mat-icon>
+                <!-- Información del archivo seleccionado o placeholder -->
                 <div class="flex-1 flex flex-row items-baseline min-w-0 mr-1">
                   <span class="text-sm font-medium flex-shrink-0">{{ archivo.label }}:</span>
                   @if (selectedFiles[archivo.key]) {
                   <span class="text-xs opacity-75 ml-1 truncate">{{selectedFiles[archivo.key].name}}</span>
                   <span
                     class="text-xs opacity-75 ml-1 flex-shrink-0">({{formatFileSize(selectedFiles[archivo.key].size)}})</span>
-                  } @else if (operacionForm.get(archivo.key + '_path')?.value) {
-                  <span class="text-xs opacity-75 ml-1 truncate">{{ getFileNameFromPath(operacionForm.get(archivo.key + '_path')?.value) }}</span>
-                  } @else {
+                  }
+                  @else if (operacionForm.get(archivo.key + '_path')?.value) {
+                  <span class="text-xs opacity-75 ml-1 truncate">{{ getFileNameFromPath(operacionForm.get(archivo.key +
+                    '_path')?.value) }}</span>
+                  }
+                  @else {
                   <span class="text-xs opacity-75 ml-1 truncate">{{archivo.placeholder}}</span>
                   }
                 </div>
+                <!-- Input oculto para seleccionar archivo -->
                 <input type="file" [accept]="getAcceptString()" (change)="onFileSelected($event, archivo.key)"
                   class="hidden" />
               </label>
+              <!-- Botón para eliminar archivo seleccionado -->
+              @if (selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value) {
+                <button type="button"
+                class="flex justify-center ml-2 px-1 py-1 rounded-full cursor-pointer border border-red-500 text-red-800 bg-red-200 hover:bg-red-100"
+                (click)="openDeleteOperationDialog(originalOperacion?.id ?? 0, archivo.key)">
+                <mat-icon class="mx-1 text-md">delete</mat-icon>
+                </button>
               }
+            }
             </div>
             }
           </div>
@@ -200,11 +222,11 @@
       </div>
     </div>
   </div>
-
-  <div mat-dialog-actions class="!flex !justify-end !gap-2 !p-3 !m-0 border-t !flex-shrink-0">
-    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-    <button mat-button color="primary" type="submit" [disabled]="!operacionForm.valid">
-      {{mode === 'create' ? 'Guardar' : 'Actualizar'}}
-    </button>
-  </div>
 </form>
+
+<div mat-dialog-actions class="!flex !justify-end !gap-2 !p-3 !m-0 border-t !flex-shrink-0">
+  <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+  <button mat-button color="primary" type="submit" [disabled]="!operacionForm.valid">
+    {{mode === 'create' ? 'Guardar' : 'Actualizar'}}
+  </button>
+</div>

@@ -4,12 +4,10 @@
     <h3 class="text-2xl mb-3">Iniciar Sesión</h3>
 
     <form [formGroup]="loginForm()">
-
       <div>
-
         <mat-form-field class="w-full mb-3" appearance="fill">
           <mat-label>Correo electrónico</mat-label>
-          <input type="email" matInput formControlName="email" [errorStateMatcher]="matcher">
+          <input type="email" matInput formControlName="email" [errorStateMatcher]="matcher" required>
           @if (loginForm().get('email')?.hasError('email') && !loginForm().get('email')?.hasError('required')) {
           <mat-error>Ingresar correo electrónico válido</mat-error>
           }
@@ -18,7 +16,7 @@
 
         <mat-form-field class="w-full" appearance="fill">
           <mat-label>Contraseña</mat-label>
-          <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password"/>
+          <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password" />
           <mat-icon matPrefix>lock</mat-icon>
           <button mat-icon-button matSuffix (click)="clickEvent($event)" [attr.aria-label]="'Hide password'"
             [attr.aria-pressed]="hide()">
@@ -26,17 +24,10 @@
           </button>
         </mat-form-field>
       </div>
-
     </form>
-    <div class="h-4 mb-4">
-      @if (loginError()) {
-      <mat-error class="m-0">
-        <mat-icon class="mr-1 align-middle">warning</mat-icon>
-        {{ loginError() }}</mat-error>
-      }
-    </div>
+    
     <button class="mb-2 w-full text-left cursor-pointer hover:underline active:text-yellow-900"
-    (click)="resetpassword()" style="color: var(--mat-sys-primary)">
+      (click)="resetpassword()" style="color: var(--mat-sys-primary)">
       Recuperar Contraseña
     </button>
 

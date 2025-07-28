@@ -29,9 +29,9 @@
             </div>
         </div>
 
-        <div class="mat-elevation-z8">
+        <div class="mat-elevation-z8 overflow-x-auto">
             <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort
-                class="border border-gray-500 table-fixed">
+                class="border border-gray-500 table-auto min-w-[1100px]">
 
                 @for (column of columnsToDisplay; track column) {
                 <ng-container matColumnDef="{{column}}">
@@ -58,11 +58,10 @@
                         class="bg-[#ffffff] border-b border-gray-500 p-1 filter-cell">
 
                         @if (column === 'id') {
-                        <div class="relative w-[86px]">
+                        <div class="relative min-w-[60px] max-w-[80px] w-full">
                             <input type="text" id="filtro_id"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroId"
+                                placeholder=" " [(ngModel)]="filtroId"
                                 (input)="applyFilter('id', $any($event.target).value)" />
                             <label for="filtro_id"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -72,11 +71,10 @@
                         }
 
                         @if (column === 'fecha') {
-                        <div class="relative w-[104px]">
+                        <div class="relative min-w-[100px] max-w-[140px] w-full">
                             <input type="text" id="filtro_fecha"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroFecha"
+                                placeholder=" " [(ngModel)]="filtroFecha"
                                 (input)="applyFilter('fecha', $any($event.target).value)" />
                             <label for="filtro_fecha"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -86,11 +84,10 @@
                         }
 
                         @if (column === 'tipo') {
-                        <div class="relative w-[86px]">
+                        <div class="relative min-w-[70px] max-w-[90px] w-full">
                             <input type="text" id="filtro_tipo"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroTipo"
+                                placeholder=" " [(ngModel)]="filtroTipo"
                                 (input)="applyFilter('tipo', $any($event.target).value)" />
                             <label for="filtro_tipo"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -100,11 +97,10 @@
                         }
 
                         @if (column === 'caracter') {
-                        <div class="relative w-[86px]">
+                        <div class="relative min-w-[70px] max-w-[90px] w-full">
                             <input type="text" id="filtro_caracter"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroCaracter"
+                                placeholder=" " [(ngModel)]="filtroCaracter"
                                 (input)="applyFilter('caracter', $any($event.target).value)" />
                             <label for="filtro_caracter"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -114,11 +110,10 @@
                         }
 
                         @if (column === 'naturaleza') {
-                        <div class="relative w-[104px]">
+                        <div class="relative min-w-[100px] max-w-[140px] w-full">
                             <input type="text" id="filtro_naturaleza"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroNaturaleza"
+                                placeholder=" " [(ngModel)]="filtroNaturaleza"
                                 (input)="applyFilter('naturaleza', $any($event.target).value)" />
                             <label for="filtro_naturaleza"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -128,11 +123,10 @@
                         }
 
                         @if (column === 'concepto') {
-                        <div class="relative w-[104px]">
+                        <div class="relative min-w-[100px] max-w-[140px] w-full">
                             <input type="text" id="filtro_concepto"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroConcepto"
+                                placeholder=" " [(ngModel)]="filtroConcepto"
                                 (input)="applyFilter('concepto', $any($event.target).value)" />
                             <label for="filtro_concepto"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -142,11 +136,10 @@
                         }
 
                         @if (column === 'categoria') {
-                        <div class="relative w-[140px]">
+                        <div class="relative min-w-[130px] max-w-[160px] w-full">
                             <input type="text" id="filtro_categoria"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroCategoria"
+                                placeholder=" " [(ngModel)]="filtroCategoria"
                                 (input)="applyFilter('categoria', $any($event.target).value)" />
                             <label for="filtro_categoria"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -156,11 +149,10 @@
                         }
 
                         @if (column === 'subcategoria') {
-                        <div class="relative w-[158px]">
+                        <div class="relative min-w-[140px] max-w-[180px] w-full">
                             <input type="text" id="filtro_subcategoria"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroSubcategoria"
+                                placeholder=" " [(ngModel)]="filtroSubcategoria"
                                 (input)="applyFilter('subcategoria', $any($event.target).value)" />
                             <label for="filtro_subcategoria"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -170,11 +162,10 @@
                         }
 
                         @if (column === 'razon_social') {
-                        <div class="relative w-[136px]">
+                        <div class="relative min-w-[130px] max-w-[160px] w-full">
                             <input type="text" id="filtro_razon_social"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroPersona"
+                                placeholder=" " [(ngModel)]="filtroPersona"
                                 (input)="applyFilter('persona', $any($event.target).value)" />
                             <label for="filtro_razon_social"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -184,11 +175,10 @@
                         }
 
                         @if (column === 'cuit') {
-                        <div class="relative w-[112px]">
+                        <div class="relative min-w-[100px] max-w-[120px] w-full">
                             <input type="text" id="filtro_cuit"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroCuit"
+                                placeholder=" " [(ngModel)]="filtroCuit"
                                 (input)="applyFilter('cuit', $any($event.target).value)" />
                             <label for="filtro_cuit"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -198,11 +188,10 @@
                         }
 
                         @if (column === 'option') {
-                        <div class="relative w-[108px]">
+                        <div class="relative min-w-[100px] max-w-[120px] w-full">
                             <input type="text" id="filtro_option"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroOption"
+                                placeholder=" " [(ngModel)]="filtroOption"
                                 (input)="applyFilter('option', $any($event.target).value)" />
                             <label for="filtro_option"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -212,11 +201,10 @@
                         }
 
                         @if (column === 'codigo') {
-                        <div class="relative w-[156px]">
+                        <div class="relative min-w-[150px] max-w-[200px] w-full">
                             <input type="text" id="filtro_codigo"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroCodigo"
+                                placeholder=" " [(ngModel)]="filtroCodigo"
                                 (input)="applyFilter('codigo', $any($event.target).value)" />
                             <label for="filtro_codigo"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -226,11 +214,10 @@
                         }
 
                         @if (column === 'monto_total') {
-                        <div class="relative w-[122px]">
+                        <div class="relative min-w-[110px] max-w-[140px] w-full">
                             <input type="text" id="filtro_monto_total"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroMonto"
+                                placeholder=" " [(ngModel)]="filtroMonto"
                                 (input)="applyFilter('monto', $any($event.target).value)" />
                             <label for="filtro_monto_total"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">
@@ -240,11 +227,10 @@
                         }
 
                         @if (column === 'usuario') {
-                        <div class="relative w-[104px]">
+                        <div class="relative min-w-[100px] max-w-[120px] w-full">
                             <input type="text" id="filtro_usuario"
                                 class="peer block w-full rounded-t-md border-b px-2.5 pb-2 pt-4 text-xs bg-[var(--mat-sys-surface-variant)] h-[42px] font-normal focus:outline-none focus:ring-0 focus:border-[var(--mat-sys-primary)]"
-                                placeholder=" "
-                                [(ngModel)]="filtroUsuario"
+                                placeholder=" " [(ngModel)]="filtroUsuario"
                                 (input)="applyFilter('usuario', $any($event.target).value)" />
                             <label for="filtro_usuario"
                                 class="absolute left-2.5 top-3.5 origin-[0] -translate-y-3 scale-75 transform cursor-text text-[var(--mat-sys-on-surface-variant)] duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-120 peer-focus:-translate-y-3 peer-focus:scale-85 peer-focus:text-[var(--mat-sys-primary)] font-normal">

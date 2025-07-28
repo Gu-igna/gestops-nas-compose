@@ -63,7 +63,7 @@ export class EntitiesComponent implements AfterViewInit {
   openEntityFormDialog(mode: 'create' | 'update', entity?: Entity) {
     const dialogRef = this.dialog.open(EntityFormDialogComponent, {
       width: '400px',
-      height: '330px',
+      height: '296px',
       data: {
         mode: mode,
         entity: entity

@@ -82,20 +82,20 @@ export class OperacionesTableComponent implements AfterViewInit {
   ];
 
   columnWidths: { [key: string]: string } = {
-    id: 'w-[86px]',
-    fecha: 'w-[104px]',
-    tipo: 'w-[86px]',
-    caracter: 'w-[86px]',
-    naturaleza: 'w-[104px]',
-    concepto: 'w-[104px]',
-    categoria: 'w-[140px]',
-    subcategoria: 'w-[158px]',
-    razon_social: 'w-[136px]',
-    cuit: 'w-[112px]',
-    option: 'w-[108px]',
-    codigo: 'w-[156px]',
-    monto_total: 'w-[122px]',
-    usuario: 'w-[104px]',
+    id: 'min-w-[60px] max-w-[80px] w-full',
+    fecha: 'min-w-[100px] max-w-[140px] w-full',
+    tipo: 'min-w-[70px] max-w-[90px] w-full',
+    caracter: 'min-w-[70px] max-w-[90px] w-full',
+    naturaleza: 'min-w-[100px] max-w-[140px] w-full',
+    concepto: 'min-w-[100px] max-w-[140px] w-full',
+    categoria: 'min-w-[130px] max-w-[160px] w-full',
+    subcategoria: 'min-w-[140px] max-w-[180px] w-full',
+    razon_social: 'min-w-[130px] max-w-[160px] w-full',
+    cuit: 'min-w-[100px] max-w-[120px] w-full',
+    option: 'min-w-[100px] max-w-[120px] w-full',
+    codigo: 'min-w-[150px] max-w-[200px] w-full',
+    monto_total: 'min-w-[110px] max-w-[140px] w-full',
+    usuario: 'min-w-[100px] max-w-[120px] w-full',
   };
 
   expandedElement: Operation | null = null;
@@ -514,7 +514,7 @@ export class OperacionesTableComponent implements AfterViewInit {
   openDeleteOperationDialog(operationId: number) {
     const dialogRef = this.dialog.open(OperacionConfirmDialogComponent, {
       width: '400px',
-      data: { operationId }
+      data: { tipo: 'operacion', id: operationId }
     });
 
     dialogRef.afterClosed().subscribe(result => {

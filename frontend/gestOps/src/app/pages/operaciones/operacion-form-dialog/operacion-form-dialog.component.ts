@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
 import { Observable, startWith, map, forkJoin, finalize } from 'rxjs';
 
-import { MatDialog, MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog'; // Import MatDialog
+import { MatDialog, MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,7 +20,9 @@ import { EntitiesService, Entity } from '../../../services/entities/entities.ser
 import { SubcategoriasService, Subcategoria, Categoria, Concepto } from '../../../services/subcategorias/subcategorias.service';
 import { FileValidationService } from '../../../services/file-validation/file-validation.service';
 import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import { FechaConfirmDialogComponent } from '../fecha-confirm-dialog/fecha-confirm-dialog.component'; // Import FechaConfirmDialogComponent
+import { FechaConfirmDialogComponent } from '../fecha-confirm-dialog/fecha-confirm-dialog.component';
+
+import { OperacionConfirmDialogComponent } from '../operacion-confirm-dialog/operacion-confirm-dialog.component';
 
 export interface Operacion {
   id?: number;
@@ -66,15 +68,17 @@ export interface Operacion {
     SubcategoriasService,
     FileValidationService,
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
-    { provide: MAT_DATE_FORMATS, useValue: {
-      parse: { dateInput: 'YYYY-MM-DD' },
-      display: {
-        dateInput: 'YYYY-MM-DD',
-        monthYearLabel: 'YYYY MMM',
-        dateA11yLabel: 'YYYY-MM-DD',
-        monthYearA11yLabel: 'YYYY MMM',
+    {
+      provide: MAT_DATE_FORMATS, useValue: {
+        parse: { dateInput: 'YYYY-MM-DD' },
+        display: {
+          dateInput: 'YYYY-MM-DD',
+          monthYearLabel: 'YYYY MMM',
+          dateA11yLabel: 'YYYY-MM-DD',
+          monthYearA11yLabel: 'YYYY MMM',
+        }
       }
-    } }
+    }
   ],
   templateUrl: './operacion-form-dialog.component.html',
   styleUrls: ['./operacion-form-dialog.component.css']
@@ -87,7 +91,7 @@ export class OperacionFormDialogComponent implements OnInit {
   private subcategoriasService = inject(SubcategoriasService);
   private fileValidationService = inject(FileValidationService);
   private fb = inject(FormBuilder);
-  private dialog = inject(MatDialog); // Inject MatDialog
+  private dialog = inject(MatDialog);
 
   public loading = false;
   public operacionForm!: FormGroup;
@@ -134,15 +138,15 @@ export class OperacionFormDialogComponent implements OnInit {
 
     this.operacionForm.get('monto_total')?.valueChanges.subscribe(value => {
       if (typeof value === 'string') {
-      let newValue = value.replace(',', '.');
-      if (newValue.includes('-')) {
-        newValue = Math.abs(Number(newValue)).toString();
-      }
-      if (!isNaN(Number(newValue))) {
-        this.operacionForm.get('monto_total')?.setValue(Number(newValue), { emitEvent: false });
-      }
+        let newValue = value.replace(',', '.');
+        if (newValue.includes('-')) {
+          newValue = Math.abs(Number(newValue)).toString();
+        }
+        if (!isNaN(Number(newValue))) {
+          this.operacionForm.get('monto_total')?.setValue(Number(newValue), { emitEvent: false });
+        }
       } else if (typeof value === 'number' && value < 0) {
-      this.operacionForm.get('monto_total')?.setValue(Math.abs(value), { emitEvent: false });
+        this.operacionForm.get('monto_total')?.setValue(Math.abs(value), { emitEvent: false });
       }
     });
 
@@ -161,7 +165,6 @@ export class OperacionFormDialogComponent implements OnInit {
       this.operacionForm.reset();
 
       setTimeout(() => {
-        // Corrección de la fecha para evitar el desfase de un día por zona horaria
         let fechaParaForm: Date | null = null;
         if (this.data.operacion!.fecha) {
           const dateParts = this.data.operacion!.fecha.split('-').map(Number);
@@ -416,7 +419,6 @@ export class OperacionFormDialogComponent implements OnInit {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    // Check if the selected date is in the past and it's a new operation
     if (fechaSeleccionada < hoy && this.mode === 'create') {
       const dialogRef = this.dialog.open(FechaConfirmDialogComponent, {
         data: {
@@ -426,14 +428,13 @@ export class OperacionFormDialogComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        if (result) { // If user clicked 'Aceptar' (Continue)
+        if (result) {
           this.proceedSubmit();
-        } else { // If user clicked 'Cancelar'
-          this.loading = false; // Ensure loading is false if submission is cancelled
+        } else {
+          this.loading = false;
         }
       });
     } else {
-      // If date is not in the past or it's an update, proceed directly
       this.proceedSubmit();
     }
   }
@@ -529,7 +530,6 @@ export class OperacionFormDialogComponent implements OnInit {
           currentValue = currentFormDate.toISOString().split('T')[0];
         }
 
-        // Specific handling for file paths
         if (key.endsWith('_path')) {
           const fileKey = key.replace('_path', '');
           if (this.selectedFiles[fileKey]) {
@@ -593,7 +593,7 @@ export class OperacionFormDialogComponent implements OnInit {
         this.loading = false;
         this.dialogRef.close(this.originalOperacion || {});
       }
-    } else { // mode === 'update'
+    } else {
       const fileUploadObservables: Observable<any>[] = [];
 
       for (const key in this.selectedFiles) {
@@ -637,6 +637,19 @@ export class OperacionFormDialogComponent implements OnInit {
 
   public onCancel(): void {
     this.dialogRef.close();
+  }
+
+  openDeleteOperationDialog(operationId: number, path: string) {
+    const dialogRef = this.dialog.open(OperacionConfirmDialogComponent, {
+      width: '400px',
+      data: { tipo: 'archivo', id: operationId, path: path }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dialogRef.close({ reload: true });
+      }
+    });
   }
 
   trackById(index: number, item: any): any {

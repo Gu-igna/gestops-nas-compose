@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Confirmar eliminación</h2>
 <mat-dialog-content>
-  ¿Está seguro de que desea eliminar esta operación?
+  ¿Está seguro de que desea eliminar {{ tipo === 'operacion' ? 'esta operación' : 'este archivo' }}?
 </mat-dialog-content>
 <mat-dialog-actions>
     <button mat-button mat-dialog-close>Cancelar</button>

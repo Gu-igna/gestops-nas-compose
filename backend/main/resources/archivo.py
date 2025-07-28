@@ -69,6 +69,52 @@ class ArchivoOperacion(Resource):
             return {'message': 'Error al obtener el archivo', 'error': str(e)}, 500
 
     @role_required(roles=["admin", "supervisor"])
+    def delete(self, id_operacion, campo_archivo):
+        """Elimina un archivo específico de una operación"""
+        try:
+            operacion = OperacionModel.query.get(id_operacion)
+            if not operacion:
+                return {'message': 'Operación no encontrada'}, 404
+
+            usuario_actual_id = get_jwt_identity()
+            usuario_actual = UsuarioModel.query.get(usuario_actual_id)
+
+            es_creador = int(operacion.id_usuario) == int(usuario_actual_id)
+            es_supervisor = "supervisor" == str(usuario_actual.rol)
+
+            if not (es_creador or es_supervisor):
+                return {'message': 'No tienes permiso para eliminar este archivo'}, 403
+
+            if es_supervisor and not es_creador:
+                operacion.modificado_por_otro = True
+
+            if es_creador and not es_supervisor:
+                operacion.modificado_por_otro = False
+
+            campos_validos = ['comprobante', 'archivo1', 'archivo2', 'archivo3']
+            if campo_archivo not in campos_validos:
+                return {'message': f'Campo de archivo "{campo_archivo}" no permitido'}, 400
+
+            old_path = getattr(operacion, f"{campo_archivo}_path", None)
+            self._eliminar_archivo_si_existe(old_path)
+            if old_path:
+                setattr(operacion, f"{campo_archivo}_path", None)
+                setattr(operacion, f"{campo_archivo}_tipo", None)
+                db.session.commit()
+                return {'message': f'Archivo "{campo_archivo}" eliminado correctamente'}, 200
+
+            return {'message': f'El archivo "{campo_archivo}" no existe'}, 404
+
+        except Exception as e:
+            db.session.rollback()
+            return {'message': 'Error al eliminar el archivo', 'error': str(e)}, 500
+
+    def _eliminar_archivo_si_existe(self, ruta_archivo):
+        if ruta_archivo and os.path.exists(ruta_archivo):
+            os.remove(ruta_archivo)
+
+
+    @role_required(roles=["admin", "supervisor"])
     def patch(self, id_operacion, campo_archivo):
         """Actualiza un archivo específico de una operación"""
         try:

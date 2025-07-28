@@ -1,0 +1,23 @@
+<div
+    class="flex items-center justify-center w-full
+        [&.error_.custom-snackbar-icon]:text-orange-400
+        [&.error_.custom-snackbar-message]:text-orange-400
+        [&.warning_.custom-snackbar-icon]:text-red-500
+        [&.warning_.custom-snackbar-message]:text-red-500
+        [&.info_.custom-snackbar-icon]:text-green-400
+        [&.info_.custom-snackbar-message]:text-green-400
+        text-lg"
+    [ngClass]="data.type"
+>
+    <span class="flex items-center justify-center flex-grow text-center">
+        @if (data.icon) {
+            <mat-icon class="custom-snackbar-icon text-[20px] w-5 h-5 mr-2">{{ data.icon }}</mat-icon>
+        }
+        <span class="custom-snackbar-message">{{ data.message }}</span>
+    </span>
+    @if (data.actionText) {
+        <button mat-button (click)="snackBarRef.dismissWithAction()">
+            {{ data.actionText }}
+        </button>
+    }
+</div>

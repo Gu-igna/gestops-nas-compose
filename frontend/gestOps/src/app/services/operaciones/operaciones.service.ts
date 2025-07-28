@@ -64,10 +64,6 @@ export class OperacionesService {
       );
   }
 
-  /**
-   * Actualiza una operación específica
-   * PATCH /api/operacion/{id}
-   */
   updateOperacion(id: number, operacion: Partial<Operacion>): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
@@ -92,23 +88,6 @@ export class OperacionesService {
     );
   }
 
-  /**
-   * Actualiza múltiples operaciones en lote
-   * PATCH /api/operaciones/bulk
-   */
-  updateOperacionesBulk(operaciones: OperacionBulkUpdate[]): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.httpClient.patch(`${this.apiUrl}/api/operaciones/bulk`, operaciones, { headers })
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
   uploadArchivos(idOperacion: number, archivos: FormData): Observable<any> {
     const token = localStorage.getItem('token');
     return this.httpClient.post(`${this.apiUrl}/api/operaciones/${idOperacion}/archivos`, archivos, {
@@ -123,6 +102,17 @@ export class OperacionesService {
   updateArchivo(idOperacion: number, campoArchivo: string, archivo: FormData): Observable<any> {
     const token = localStorage.getItem('token');
     return this.httpClient.patch(`${this.apiUrl}/api/operacion/${idOperacion}/archivo/${campoArchivo}`, archivo, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  deleteArchivo(idOperacion: number, campoArchivo: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    return this.httpClient.delete(`${this.apiUrl}/api/operacion/${idOperacion}/archivo/${campoArchivo}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

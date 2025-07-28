@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ mode === 'create' ? 'Crear Usuario' : 'Actualizar Usuario' }}</h2>
 <mat-dialog-content>
-  @if (!isLoading) {
+  @if (!isLoading()) {
   <form [formGroup]="userForm()">
     <div class="flex gap-4">
       <mat-form-field appearance="fill" class="w-1/2">
@@ -26,16 +26,9 @@
         <mat-button-toggle value="admin">Administrador</mat-button-toggle>
       </mat-button-toggle-group>
     </div>
-    <div class="h-4 mt-4 flex justify-center items-center">
-      @if (emailExistsError) {
-      <mat-error>
-        <mat-icon class="mr-1 align-middle">warning</mat-icon> Correo electrónico registrado
-      </mat-error>
-      }
-    </div>
   </form>
   }
-  @if (isLoading) {
+  @if (isLoading()) {
   <div class="flex justify-center h-full items-center">
     <mat-spinner></mat-spinner>
   </div>

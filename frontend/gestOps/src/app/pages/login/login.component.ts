@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import { Component, signal } from '@angular/core';
 import {
   FormGroup,
   FormsModule,
@@ -8,14 +8,16 @@ import {
   NgForm,
   Validators,
 } from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../services/auth/auth.service';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { SnackbarService } from '../../services/snackbar/snackbar.service';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -26,8 +28,14 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 
 @Component({
   selector: 'app-login',
-  imports: [MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, 
-    ReactiveFormsModule, FormsModule,
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatSnackBarModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -44,15 +52,16 @@ export class LoginComponent {
   matcher = new MyErrorStateMatcher();
   hide = signal(true);
 
-  loginError = signal('');
-
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private snackbarService: SnackbarService
+  ) { }
 
   clickEvent(event: MouseEvent) {
     this.hide.set(!this.hide());
     event.stopPropagation();
   }
-  
 
   onSubmit(): void {
     if (this.loginForm().valid) {
@@ -70,13 +79,10 @@ export class LoginComponent {
           console.log('Login exitoso:', response);
         },
         error: (err) => {
-          this.loginError.set('No se pudo iniciar sesión');
+          this.snackbarService.showWarning('Credenciales inválidas. Por favor, intente de nuevo.');
           console.error('Error en login:', err);
         },
       });
-    } else {
-      this.loginError.set('Formulario inválido');
-      console.error('Formulario inválido');
     }
   }
 

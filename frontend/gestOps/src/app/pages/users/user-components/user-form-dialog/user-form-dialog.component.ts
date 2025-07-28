@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../../../services/auth/auth.service';
 import { UsersService } from '../../../../services/users/users.service';
+import { SnackbarService } from '../../../../services/snackbar/snackbar.service';
 
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormControl, Validators } from '@angular/forms';
@@ -18,16 +19,14 @@ import { FormControl, Validators } from '@angular/forms';
   selector: 'app-user-form-dialog',
   templateUrl: './user-form-dialog.component.html',
   styleUrls: ['./user-form-dialog.component.css'],
-  imports: [MatDialogModule, MatButtonModule, MatButtonToggleModule, MatIcon, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatProgressSpinnerModule],
+  imports: [MatDialogModule, MatButtonModule, MatButtonToggleModule, MatSnackBarModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatProgressSpinnerModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserFormDialogComponent {
   readonly dialogRef = inject(MatDialogRef<UserFormDialogComponent>);
   mode: 'create' | 'update';
 
-  isLoading = false;
-
-  emailExistsError = false;
+  isLoading = signal(false);
 
   userForm = signal(
     new FormGroup({
@@ -42,7 +41,7 @@ export class UserFormDialogComponent {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-    private cdr: ChangeDetectorRef
+    private snackbarService: SnackbarService
   ) {
     const data = inject(MAT_DIALOG_DATA) as { mode: 'create' | 'update', user?: User };
     this.mode = data.mode;
@@ -70,44 +69,36 @@ export class UserFormDialogComponent {
           ...rest,
           password: 'password'
         };
-        this.isLoading = true;
-        this.cdr.detectChanges();
+        this.isLoading.set(true);
         this.authService.register(registrationData).subscribe({
           next: (user) => {
-            this.isLoading = false;
-            this.cdr.detectChanges();
+            this.isLoading.set(false);
             this.dialogRef.close({
               mode: this.mode,
               user: user
             });
           },
           error: (error) => {
-            this.isLoading = false;
+            this.isLoading.set(false);
             if (error && (error.status === 409 || (error.message && error.message.includes('409')))) {
-              this.emailExistsError = true;
-            } else {
-              this.emailExistsError = false;
+              this.snackbarService.showWarning('Correo electrónico ya registrado.');
+              console.error('Registration failed:', error);
             }
-            this.cdr.detectChanges();
-            console.error('Registration failed:', error);
           }
         });
       } else {
         const { id, ...updateData } = userData;
-        this.isLoading = true;
-        this.cdr.detectChanges();
+        this.isLoading.set(true);
         this.usersService.updateUser(id, updateData).subscribe({
           next: (user) => {
-            this.isLoading = false;
-            this.cdr.detectChanges();
+            this.isLoading.set(false);
             this.dialogRef.close({
               mode: this.mode,
               user: user
             });
           },
           error: (error) => {
-            this.isLoading = false;
-            this.cdr.detectChanges();
+            this.isLoading.set(false);
             console.error('Update failed:', error);
           }
         });

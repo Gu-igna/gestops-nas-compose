@@ -6,7 +6,7 @@
             <a mat-tab-link [routerLink]="'/' + route.path" routerLinkActive #rla="routerLinkActive"
                 [active]="rla.isActive" class="text-lg">
                 <mat-icon>{{route.icon}}</mat-icon>
-                <span class="ml-2">{{route.label}}</span>
+                <span class="hidden ml-2 lg:inline">{{route.label}}</span>
             </a>
             }
         </nav>
@@ -16,7 +16,7 @@
         <div class="basis-1/6 flex items-center justify-center bg-white">
             <button mat-button (click)="logout()" class="text-lg">
                 <mat-icon class="text-[26px] h-[26px] w-[26px]">logout</mat-icon>
-                Cerrar sesión
+                <span class="hidden ml-2 lg:inline lg:m-0 lg:p-0">Cerrar sesión</span>
             </button>
         </div>
     </nav>

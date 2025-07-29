@@ -79,7 +79,7 @@ export class LoginComponent {
           console.log('Login exitoso:', response);
         },
         error: (err) => {
-          this.snackbarService.showWarning('Credenciales inválidas. Por favor, intente de nuevo.');
+            this.snackbarService.showWarning('Credenciales inválidas.Intente de nuevo.');
           console.error('Error en login:', err);
         },
       });

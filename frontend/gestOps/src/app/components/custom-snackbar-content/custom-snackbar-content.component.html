@@ -10,10 +10,19 @@
     [ngClass]="data.type"
 >
     <span class="flex items-center justify-center flex-grow text-center">
-        @if (data.icon) {
-            <mat-icon class="custom-snackbar-icon text-[20px] w-5 h-5 mr-2">{{ data.icon }}</mat-icon>
-        }
-        <span class="custom-snackbar-message">{{ data.message }}</span>
+        <mat-icon class="custom-snackbar-icon text-[30px] w-9 mr-1">{{ data.icon }}</mat-icon>
+        <span class="custom-snackbar-message">
+            @if (data.message.includes('.')) {
+                {{ data.message.split('.')[0] }}.<br>{{ data.message.substring(data.message.indexOf('.') + 1) }}
+            } @else {
+                <ng-template #normalMessage>
+                    {{ data.message }}
+                </ng-template>
+            }
+            <ng-template #normalMessage>
+                {{ data.message }}
+            </ng-template>
+        </span>
     </span>
     @if (data.actionText) {
         <button mat-button (click)="snackBarRef.dismissWithAction()">

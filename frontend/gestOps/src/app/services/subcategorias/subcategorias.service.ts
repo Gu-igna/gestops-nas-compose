@@ -56,20 +56,34 @@ export class SubcategoriasService {
     );
   }
 
-  getSubcategorias(page: number = 1, perPage: number = 10, searchTerm: string = ''): Observable<{
+  getSubcategorias(
+    page: number = 1,
+    perPage: number = 10,
+    searchTerm: string = '',
+    filters: { [key: string]: string | number } = {}
+  ): Observable<{
     subcategorias: Subcategoria[];
     total: number;
     pages: number;
     page: number;
   }> {
     const token = localStorage.getItem('token');
-    let params = new URLSearchParams({
+    const params = new URLSearchParams({
       page: page.toString(),
       per_page: perPage.toString()
     });
+
     if (searchTerm) {
       params.append('busqueda', searchTerm);
     }
+
+    // Add combined filters to query params
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value.toString());
+      }
+    });
+
     return this.httpClient.get<{
       subcategorias: Subcategoria[];
       total: number;

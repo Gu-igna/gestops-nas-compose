@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -6,6 +6,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,7 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SubcategoriaFormDialogComponent } from '../subcategoria-form-dialog/subcategoria-form-dialog.component';
 import { SubcategoriaConfirmDialogComponent } from '../subcategoria-confirm-dialog/subcategoria-confirm-dialog.component';
 
-import { 
+import {
   SubcategoriasService,
   Subcategoria
 } from '../../../../services/subcategorias/subcategorias.service';
@@ -30,11 +31,13 @@ import {
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,
+    FormsModule,
   ],
   templateUrl: './subcategorias-table.component.html',
   styleUrl: './subcategorias-table.component.css'
 })
-export class SubcategoriasTableComponent {
+
+export class SubcategoriasTableComponent implements OnInit, AfterViewInit {
   headerColor = 'bg-[#006e2e]/70';
 
   columnsToDisplay: string[] = ['concepto','categoria', 'subcategoria'];
@@ -42,7 +45,13 @@ export class SubcategoriasTableComponent {
 
   totalSubcategorias = 0;
   currentPage = 1;
-  searchTerm = '';
+
+  filtroGlobal: string = '';
+  filtroConcepto: string = '';
+  filtroCategoria: string = '';
+  filtroSubcategoria: string = '';
+
+  filterColumns: string[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -52,10 +61,15 @@ export class SubcategoriasTableComponent {
     private dialog: MatDialog
   ) { }
 
+  ngOnInit() {
+    this.filterColumns = this.columnsToDisplay.map(col => col + '-filter').concat(['actions-filter']);
+    this.loadSubcategorias();
+  }
+
   ngAfterViewInit() {
     this.paginator.page.subscribe(pageEvent => {
       this.currentPage = pageEvent.pageIndex + 1;
-      this.loadSubcategorias(this.currentPage, this.searchTerm);
+      this.loadSubcategorias();
     });
 
     this.dataSource.sortingDataAccessor = (item: Subcategoria, property: string) => {
@@ -81,7 +95,7 @@ export class SubcategoriasTableComponent {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log(`Subcategoria ${mode}:`, result);
-        this.loadSubcategorias(this.currentPage, this.searchTerm);
+        this.loadSubcategorias();
       }
     });
   }
@@ -96,29 +110,70 @@ export class SubcategoriasTableComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadSubcategorias(this.currentPage, this.searchTerm);
+        this.loadSubcategorias();
       }
     });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.searchTerm = filterValue;
+  applyFilter(column: string, value: string) {
+    this.currentPage = 1;
+    this.paginator.pageIndex = 0;
 
-    if (filterValue === '' || filterValue.length >= 1) {
-      this.currentPage = 1;
-      this.paginator.pageIndex = 0;
-      this.loadSubcategorias(this.currentPage, filterValue);
+    if (column === 'global') {
+        this.filtroGlobal = value;
+        this.filtroConcepto = '';
+        this.filtroCategoria = '';
+        this.filtroSubcategoria = '';
+    } else {
+        this.filtroGlobal = '';
+        if (column === 'concepto') {
+            this.filtroConcepto = value;
+        } else if (column === 'categoria') {
+            this.filtroCategoria = value;
+        } else if (column === 'subcategoria') {
+            this.filtroSubcategoria = value;
+        }
     }
-  }
-
-  ngOnInit() {
     this.loadSubcategorias();
   }
 
-  loadSubcategorias(page: number = 1, searchTerm: string = '') {
+  clearFilters() {
+    this.filtroGlobal = '';
+    this.filtroConcepto = '';
+    this.filtroCategoria = '';
+    this.filtroSubcategoria = '';
+    this.currentPage = 1;
+    this.paginator.pageIndex = 0;
+    this.loadSubcategorias();
+  }
+
+
+  loadSubcategorias() {
     const perPage = this.paginator?.pageSize || 10;
-    this.subcategoriasService.getSubcategorias(page, perPage,searchTerm).subscribe({
+    const filters: { [key: string]: string | number } = {};
+
+    let searchTermForService = '';
+
+    if (this.filtroGlobal) {
+        searchTermForService = this.filtroGlobal;
+    } else {
+        if (this.filtroConcepto) {
+            filters['concepto'] = this.filtroConcepto;
+        }
+        if (this.filtroCategoria) {
+            filters['categoria'] = this.filtroCategoria;
+        }
+        if (this.filtroSubcategoria) {
+            filters['subcategoria'] = this.filtroSubcategoria;
+        }
+    }
+
+    this.subcategoriasService.getSubcategorias(
+      this.currentPage,
+      perPage,
+      searchTermForService,
+      filters
+    ).subscribe({
       next: (response) => {
         this.dataSource.data = response.subcategorias;
         this.totalSubcategorias = response.total;
@@ -133,5 +188,4 @@ export class SubcategoriasTableComponent {
       }
     });
   }
-
 }

@@ -47,16 +47,24 @@ class Subcategoria(Resource):
 class Subcategorias(Resource):
     @role_required(roles=["admin", "supervisor"])
     def get(self):
-        """Obtiene lista paginada de subcategorias con opción de búsqueda"""
+        """Obtiene lista paginada de subcategorias con opción de búsqueda y filtros combinados"""
         try:
-            page = request.args.get('page', default=1, type=int)
-            per_page = request.args.get('per_page', default=10, type=int)
+            page = request.args.get('page', type=int)
+            per_page = request.args.get('per_page', type=int)
 
             query = db.session.query(SubcategoriaModel)
 
-            query = self._aplicar_busqueda_general(query)
+            filtros = self._generar_filtros(request.args)
+            if filtros:
+                query = query.filter(*filtros)
 
-            if (page == 0 and per_page == 0):
+            # Búsqueda general (parámetro 'busqueda')
+            busqueda = request.args.get('busqueda')
+            if busqueda:
+                query = self._aplicar_busqueda_general(query)
+
+            # Si no se especifican parámetros de paginación, devolver todos los registros
+            if page is None or per_page is None or (page == 0 and per_page == 0):
                 subcategorias = query.all()
                 return {
                     'subcategorias': [subcategoria.to_json() for subcategoria in subcategorias],
@@ -79,13 +87,42 @@ class Subcategorias(Resource):
         except Exception as e:
             return {'message': str(e)}, 500
 
+    def _generar_filtros(self, params):
+        """Genera una lista de filtros combinados en base a los parámetros de la request"""
+        from main.models import CategoriaModel, ConceptoModel
+
+        campos_busqueda = {
+            'id': lambda t: SubcategoriaModel.id == int(t),
+            'nombre': lambda t: SubcategoriaModel.nombre.ilike(f"%{t}%"),
+            'categoria': lambda t: SubcategoriaModel.categoria.has(
+                CategoriaModel.nombre.ilike(f"%{t}%")
+            ),
+            'concepto': lambda t: SubcategoriaModel.categoria.has(
+                CategoriaModel.concepto.has(
+                    ConceptoModel.nombre.ilike(f"%{t}%")
+                )
+            ),
+            'subcategoria': lambda t: SubcategoriaModel.nombre.ilike(f"%{t}%"),
+        }
+
+        filtros = []
+        # Procesar todos los filtros (combinados con AND)
+        for campo, valor in params.items():
+            if campo in ['page', 'per_page', 'busqueda']:
+                continue
+            if campo in campos_busqueda and valor:
+                try:
+                    filtros.append(campos_busqueda[campo](valor))
+                except Exception as e:
+                    print(f"Error aplicando filtro {campo}: {str(e)}")
+                    continue
+        return filtros
+
     def _aplicar_busqueda_general(self, query):
         """Aplica búsqueda global sobre varios campos."""
         search = request.args.get('busqueda')
-
         if search:
             from main.models import CategoriaModel, ConceptoModel
-            
             subquery = db.session.query(CategoriaModel.id).filter(
                 CategoriaModel.id_concepto.in_(
                     db.session.query(ConceptoModel.id).filter(
@@ -93,20 +130,13 @@ class Subcategorias(Resource):
                     )
                 )
             )
-    
             conditions = [
-                # Buscar en nombre de subcategoría
+                SubcategoriaModel.id.like(f'%{search}%'),
                 SubcategoriaModel.nombre.ilike(f'%{search}%'),
-                # Buscar en nombre de categoría
                 SubcategoriaModel.categoria.has(CategoriaModel.nombre.ilike(f'%{search}%')),
-                # Buscar en nombre de concepto usando subconsulta
                 SubcategoriaModel.id_categoria.in_(subquery)
             ]
-            
-            filtered_query = query.filter(or_(*conditions))
-            
-            return filtered_query
-        
+            query = query.filter(or_(*conditions))
         return query
 
     @role_required(roles=["admin", "supervisor"])

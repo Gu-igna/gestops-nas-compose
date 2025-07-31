@@ -81,23 +81,6 @@ export class OperacionesTableComponent implements AfterViewInit {
     'observaciones'
   ];
 
-  columnWidths: { [key: string]: string } = {
-    id: 'min-w-[60px] max-w-[80px] w-full',
-    fecha: 'min-w-[100px] max-w-[140px] w-full',
-    tipo: 'min-w-[70px] max-w-[90px] w-full',
-    caracter: 'min-w-[70px] max-w-[90px] w-full',
-    naturaleza: 'min-w-[100px] max-w-[140px] w-full',
-    concepto: 'min-w-[100px] max-w-[140px] w-full',
-    categoria: 'min-w-[130px] max-w-[160px] w-full',
-    subcategoria: 'min-w-[140px] max-w-[180px] w-full',
-    razon_social: 'min-w-[130px] max-w-[160px] w-full',
-    cuit: 'min-w-[100px] max-w-[120px] w-full',
-    option: 'min-w-[100px] max-w-[120px] w-full',
-    codigo: 'min-w-[150px] max-w-[200px] w-full',
-    monto_total: 'min-w-[110px] max-w-[140px] w-full',
-    usuario: 'min-w-[100px] max-w-[120px] w-full',
-  };
-
   expandedElement: Operation | null = null;
 
   // Subject para debounce de filtros
@@ -131,10 +114,6 @@ export class OperacionesTableComponent implements AfterViewInit {
       this.paginator.pageSize = this.pageSize;
       this.paginator.pageIndex = this.currentPage - 1;
     }
-  }
-
-  getColumnWidthClass(column: string): string {
-    return this.columnWidths[column] || '';
   }
 
   loadOperaciones(): void {
@@ -408,9 +387,7 @@ export class OperacionesTableComponent implements AfterViewInit {
   openCreateDialog() {
     const dialogRef = this.dialog.open(OperacionFormDialogComponent, {
       width: '95vw',
-      height: '90vh',
       maxWidth: '1200px',
-      maxHeight: '90vh',
       data: {
         mode: 'create'
       }
@@ -430,9 +407,7 @@ export class OperacionesTableComponent implements AfterViewInit {
 
         const dialogRef = this.dialog.open(OperacionFormDialogComponent, {
           width: '95vw',
-          height: '90vh',
           maxWidth: '1200px',
-          maxHeight: '90vh',
           data: {
             mode: 'update',
             operacion: operacionToUpdate

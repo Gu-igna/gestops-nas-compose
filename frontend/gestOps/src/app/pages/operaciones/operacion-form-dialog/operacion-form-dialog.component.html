@@ -7,7 +7,7 @@
       <mat-progress-spinner color="primary" mode="indeterminate" diameter="120"></mat-progress-spinner>
     </div>
     }
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 pb-0 h-[calc(90vh-120px)]">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 px-6 pt-6 pb-0 h-[calc(90vh-120px)]">
       <!-- Fila 1: Fecha -->
       <div>
         <mat-form-field class="w-full">
@@ -20,25 +20,25 @@
           }
         </mat-form-field>
       </div>
-      <div></div>
-      <div></div>
+      <div class="hidden md:block"></div>
+      <div class="hidden md:block"></div>
 
       <!-- Fila 2: Tipo, Carácter, Naturaleza -->
-      <div>
+      <div class="mb-2">
         <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Tipo*</label>
         <mat-button-toggle-group formControlName="tipo" aria-label="Tipo de operación" class="flex">
           <mat-button-toggle value="ingreso" class="flex-1">Ingreso</mat-button-toggle>
           <mat-button-toggle value="egreso" class="flex-1">Egreso</mat-button-toggle>
         </mat-button-toggle-group>
       </div>
-      <div>
+      <div class="mb-2">
         <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Carácter*</label>
         <mat-button-toggle-group formControlName="caracter" aria-label="Carácter" class="flex">
           <mat-button-toggle value="casa" class="flex-1">Casa</mat-button-toggle>
           <mat-button-toggle value="oficina" class="flex-1">Oficina</mat-button-toggle>
         </mat-button-toggle-group>
       </div>
-      <div>
+      <div class="mb-2">
         <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Naturaleza*</label>
         <mat-button-toggle-group formControlName="naturaleza" aria-label="Naturaleza" class="flex">
           <mat-button-toggle value="societario" class="flex-1">Societario</mat-button-toggle>
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Fila 3: Subcategoría (3 columnas) -->
-      <mat-form-field appearance="fill" class="w-full md:col-span-3">
+      <mat-form-field appearance="fill" class="w-full md:col-span-3 max-h-[76px] pt-0">
         <mat-label>Subcategoría</mat-label>
         <input type="text" matInput [formControl]="subcategoriaCtrl" [matAutocomplete]="autoSubcategoria"
           (focus)="subcategoriaCtrl.setValue(subcategoriaCtrl.value || '')"> <mat-autocomplete
@@ -73,7 +73,7 @@
       </mat-form-field>
 
       <!-- Fila 4: Persona  (3 columnas, con autocompletado) -->
-      <mat-form-field appearance="fill" class="w-full md:col-span-3">
+      <mat-form-field appearance="fill" class="w-full md:col-span-3 max-h-[76px] pt-0">
         <mat-label>Persona (Física/Jurídica)</mat-label>
         <input type="text" matInput [formControl]="entidadCtrl" [matAutocomplete]="autoPersona"
           (focus)="entidadCtrl.setValue(entidadCtrl.value || '')"> <mat-autocomplete #autoPersona="matAutocomplete"
@@ -90,14 +90,14 @@
       </mat-form-field>
 
       <!-- Fila 5: Tipo de Comprobante, Código, Monto -->
-      <div>
+      <div class="mb-2">
         <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Tipo de Comprobante*</label>
         <mat-button-toggle-group formControlName="option" aria-label="Tipo de Comprobante" class="flex">
           <mat-button-toggle value="factura" class="flex-1">Factura</mat-button-toggle>
           <mat-button-toggle value="boleta" class="flex-1">Boleta</mat-button-toggle>
         </mat-button-toggle-group>
       </div>
-      <mat-form-field appearance="fill" class="w-full mt-2 pt-0">
+      <mat-form-field appearance="fill" class="w-full pt-0 max-h-[76px]">
         <mat-label>Código</mat-label>
         <input matInput formControlName="codigo" required>
         @if (operacionForm.get('codigo')?.hasError('required')) {
@@ -113,7 +113,7 @@
         <mat-error>El código de boleta debe ser numérico</mat-error>
         }
       </mat-form-field>
-      <mat-form-field class="w-full mt-2 pt-0">
+      <mat-form-field class="w-full mb-2 pt-0 max-h-[76px]">
         <mat-label>Monto Total</mat-label>
         <input matInput type="number" formControlName="monto_total" required step="0.01">
         @if (operacionForm.get('monto_total')?.hasError('required')) {
@@ -128,13 +128,16 @@
       </mat-form-field>
 
       <!-- Fila 6: Método de Pago (2 columnas) y Archivos Adjuntos (1 columna) -->
-      <div class="md:col-span-2 flex flex-col gap-4">
+      <div class="md:col-span-2 flex flex-col gap-4 mb-2">
         <div>
           <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Método de Pago*</label>
           <mat-button-toggle-group formControlName="metodo_de_pago" aria-label="Método de Pago" class="flex">
             <mat-button-toggle value="efectivo" class="flex-1">Efectivo</mat-button-toggle>
             <mat-button-toggle value="debito" class="flex-1">Débito</mat-button-toggle>
-            <mat-button-toggle value="transferencia" class="flex-1">Transferencia</mat-button-toggle>
+            <mat-button-toggle value="transferencia" class="flex-1">
+              <span class="hidden sm:inline">Transferencia</span>
+              <span class="inline sm:hidden">Transf.</span>
+            </mat-button-toggle>
             <mat-button-toggle value="mixto" class="flex-1">Mixto</mat-button-toggle>
             <mat-button-toggle value="otro" class="flex-1">Otro</mat-button-toggle>
           </mat-button-toggle-group>
@@ -203,8 +206,8 @@
                   }
                 </div>
                 <!-- Input oculto para seleccionar archivo -->
-                <input type="file" [accept]="getAcceptString()" (change)="onFileSelected($event, archivo.key)"
-                  class="hidden" />
+                <input type="file" [id]="'file-input-' + archivo.key" [accept]="getAcceptString()"
+                  (change)="onFileSelected($event, archivo.key)" class="hidden" />
               </label>
               <!-- Botón para eliminar archivo seleccionado -->
               @if (selectedFiles[archivo.key] || operacionForm.get(archivo.key + '_path')?.value) {

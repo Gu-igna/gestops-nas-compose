@@ -361,19 +361,30 @@ export class OperacionFormDialogComponent implements OnInit {
   }
 
   public onFileSelected(event: Event, key: string): void {
-    const file = (event.target as HTMLInputElement)?.files?.[0];
-    if (!file) return;
+    const inputElement = event.target as HTMLInputElement;
+    const file = inputElement?.files?.[0];
+
+    if (!file) {
+      delete this.selectedFiles[key];
+      this.fileErrors[key] = '';
+      this.operacionForm.get(`${key}_path`)?.setValue(null);
+      if (inputElement) {
+        inputElement.value = '';
+      }
+      return;
+    }
 
     const validation = this.fileValidationService.validateFile(file);
     if (validation.isValid) {
       this.selectedFiles[key] = file;
       this.fileErrors[key] = '';
-      // Clear the existing path if a new file is selected
       this.operacionForm.get(`${key}_path`)?.setValue(null);
     } else {
       this.fileErrors[key] = validation.message;
       delete this.selectedFiles[key];
-      (event.target as HTMLInputElement).value = '';
+      if (inputElement) {
+        inputElement.value = '';
+      }
     }
   }
 
@@ -639,17 +650,38 @@ export class OperacionFormDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  openDeleteOperationDialog(operationId: number, path: string) {
-    const dialogRef = this.dialog.open(OperacionConfirmDialogComponent, {
-      width: '400px',
-      data: { tipo: 'archivo', id: operationId, path: path }
-    });
+  private resetFileInput(key: string): void {
+    const inputElement = document.getElementById(`file-input-${key}`) as HTMLInputElement;
+    if (inputElement) {
+      inputElement.value = '';
+    }
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.dialogRef.close({ reload: true });
-      }
-    });
+  openDeleteOperationDialog(operacionId: number | undefined, fileKey: string) {
+    if (this.selectedFiles[fileKey]) {
+      delete this.selectedFiles[fileKey];
+      this.operacionForm.get(`${fileKey}_path`)?.setValue(null);
+      this.fileErrors[fileKey] = '';
+      this.resetFileInput(fileKey);
+      return; 
+    }
+
+    const filePath = this.operacionForm.get(`${fileKey}_path`)?.value;
+    if (filePath && operacionId) {
+      const dialogRef = this.dialog.open(OperacionConfirmDialogComponent, {
+        width: '400px',
+        data: { tipo: 'archivo', id: operacionId, path: fileKey }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.operacionForm.get(`${fileKey}_path`)?.setValue(null);
+          delete this.selectedFiles[fileKey];
+          this.fileErrors[fileKey] = '';
+          this.resetFileInput(fileKey);
+        }
+      });
+    }
   }
 
   trackById(index: number, item: any): any {

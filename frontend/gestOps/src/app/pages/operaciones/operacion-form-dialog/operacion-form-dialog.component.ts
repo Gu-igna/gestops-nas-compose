@@ -121,8 +121,8 @@ export class OperacionFormDialogComponent implements OnInit {
   public subcategorias: Subcategoria[] = [];
   public conceptosAgrupados: any[] = [];
 
-  public entidadCtrl = new FormControl<string | Entity>('', [this.objectRequiredValidator()]);
-  public subcategoriaCtrl = new FormControl<string | Subcategoria>('', [this.objectRequiredValidator()]);
+  public entidadCtrl = new FormControl<string | Entity>('', [Validators.required, this.objectRequiredValidator()]);
+  public subcategoriaCtrl = new FormControl<string | Subcategoria>('', [Validators.required, this.objectRequiredValidator()]);
   public filteredPersonas!: Observable<Entity[]>;
   public filteredSubcategorias!: Observable<any[]>;
 

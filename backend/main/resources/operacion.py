@@ -7,17 +7,34 @@ from sqlalchemy import or_
 from dateutil.parser import parse
 from main.models import OperacionModel, PersonaModel, UsuarioModel, SubcategoriaModel, CategoriaModel, ConceptoModel
 from main.auth.decorators import role_required
+from main.config.logging_config import get_logger, log_request_response
 import pandas as pd
 from datetime import datetime
 
 class Operacion(Resource):
     @role_required(roles=["admin","supervisor"])
+    @log_request_response
     def get(self, id):
         """"Obtiene una operacion por su ID"""
+        logger = get_logger('operacion')
+        
         try:
+            logger.info(f"Consultando operación ID: {id}", extra={
+                'extra_data': {'operacion_id': id, 'user_id': get_jwt_identity()}
+            })
+            
             operacion  = db.session.query(OperacionModel).get_or_404(id)
+            
+            logger.info(f"Operación {id} encontrada exitosamente", extra={
+                'extra_data': {'operacion_id': id, 'concepto': operacion.concepto}
+            })
+            
             return operacion.to_json(), 200
+            
         except Exception as e:
+            logger.error(f"Error al consultar operación {id}: {str(e)}", extra={
+                'extra_data': {'operacion_id': id, 'error_type': type(e).__name__}
+            }, exc_info=True)
             return {'message': str(e)}, 500
         
     @role_required(roles=["admin","supervisor"])
@@ -116,6 +133,8 @@ class Operaciones(Resource):
     @role_required(roles=["admin","supervisor"])
     def get(self):
         """Obtiene lista paginada de operaciones con opción de búsqueda"""
+        logger = get_logger('operaciones')
+        
         try:
             page = request.args.get('page', type=int)
             per_page = request.args.get('per_page', type=int)
@@ -123,10 +142,14 @@ class Operaciones(Resource):
             query = db.session.query(OperacionModel)
 
             # Debug: mostrar parámetros recibidos
-            print(f"Parámetros recibidos: {dict(request.args)}")
+            logger.debug("Parámetros de consulta recibidos", extra={
+                'extra_data': {'params': dict(request.args)}
+            })
 
             filtros = self._generar_filtros(request.args)
-            print(f"Filtros generados: {len(filtros)}")
+            logger.debug(f"Filtros de consulta generados", extra={
+                'extra_data': {'num_filtros': len(filtros)}
+            })
             
             query = query.filter(*filtros) if filtros else query
 
@@ -158,7 +181,13 @@ class Operaciones(Resource):
                 'page': operaciones.page,  
             }, 200
         except Exception as e:
-            print(f"Error en get operaciones: {str(e)}")
+            logger.error("Error al obtener operaciones", extra={
+                'extra_data': {
+                    'page': request.args.get('page'),
+                    'per_page': request.args.get('per_page'),
+                    'error_type': type(e).__name__
+                }
+            }, exc_info=True)
             import traceback
             traceback.print_exc()
             return {'message': f'Error interno del servidor: {str(e)}'}, 500
@@ -270,7 +299,14 @@ class Operaciones(Resource):
                         filtros.append(campos_busqueda[campo].like(f"%{valor}%"))
                 except Exception as e:
                     # Log el error pero continúa con otros filtros
-                    print(f"Error aplicando filtro {campo}: {str(e)}")
+                    logger = get_logger('operaciones')
+                    logger.warning(f"Error aplicando filtro de búsqueda", extra={
+                        'extra_data': {
+                            'campo': campo,
+                            'valor': valor,
+                            'error_type': type(e).__name__
+                        }
+                    })
                     continue
 
         return filtros

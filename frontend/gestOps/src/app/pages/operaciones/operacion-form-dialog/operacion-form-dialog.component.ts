@@ -84,6 +84,25 @@ export interface Operacion {
   styleUrls: ['./operacion-form-dialog.component.css']
 })
 export class OperacionFormDialogComponent implements OnInit {
+
+
+  public screenSize: 'sm' | 'md' | 'lg' = 'lg';
+
+  private handleResize = () => {
+    this.updateScreenSize();
+  };
+
+  private updateScreenSize(): void {
+    const width = window.innerWidth;
+    if (width < 600) {
+      this.screenSize = 'sm';
+    } else if (width < 960) {
+      this.screenSize = 'md';
+    } else {
+      this.screenSize = 'lg';
+    }
+  }
+
   private dialogRef = inject(MatDialogRef<OperacionFormDialogComponent>);
   private data: { operacion?: Operacion, mode: 'create' | 'update' } = inject(MAT_DIALOG_DATA);
   private operacionesService = inject(OperacionesService);
@@ -117,6 +136,8 @@ export class OperacionFormDialogComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.updateScreenSize();
+    window.addEventListener('resize', this.handleResize);
     this.operacionForm = this.fb.group({
       fecha: ['', Validators.required],
       tipo: ['', Validators.required],
@@ -686,5 +707,8 @@ export class OperacionFormDialogComponent implements OnInit {
 
   trackById(index: number, item: any): any {
     return item.id;
+  }
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.handleResize);
   }
 }

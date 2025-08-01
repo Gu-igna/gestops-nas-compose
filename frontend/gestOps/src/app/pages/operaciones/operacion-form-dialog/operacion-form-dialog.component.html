@@ -129,19 +129,31 @@
 
       <!-- Fila 6: Método de Pago (2 columnas) y Archivos Adjuntos (1 columna) -->
       <div class="md:col-span-2 flex flex-col gap-4 mb-2">
-        <div>
-          <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Método de Pago*</label>
-          <mat-button-toggle-group formControlName="metodo_de_pago" aria-label="Método de Pago" class="flex">
-            <mat-button-toggle value="efectivo" class="flex-1">Efectivo</mat-button-toggle>
-            <mat-button-toggle value="debito" class="flex-1">Débito</mat-button-toggle>
-            <mat-button-toggle value="transferencia" class="flex-1">
-              <span class="hidden sm:inline">Transferencia</span>
-              <span class="inline sm:hidden">Transf.</span>
-            </mat-button-toggle>
-            <mat-button-toggle value="mixto" class="flex-1">Mixto</mat-button-toggle>
-            <mat-button-toggle value="otro" class="flex-1">Otro</mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
+        @if (this.screenSize !== 'sm') {
+        <label class="text-base mb-2" style="color: var(--mat-sys-on-surface-variant);">Método de Pago*</label>
+        <mat-button-toggle-group formControlName="metodo_de_pago" aria-label="Método de Pago" class="flex">
+          <mat-button-toggle value="efectivo" class="flex-1">Efectivo</mat-button-toggle>
+          <mat-button-toggle value="debito" class="flex-1">Débito</mat-button-toggle>
+          <mat-button-toggle value="transferencia" class="flex-1">
+            <span class="hidden sm:inline">Transferencia</span>
+            <span class="inline sm:hidden">Transf.</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="mixto" class="flex-1">Mixto</mat-button-toggle>
+          <mat-button-toggle value="otro" class="flex-1">Otro</mat-button-toggle>
+        </mat-button-toggle-group>
+        }
+        @else {
+        <mat-form-field class="w-full">
+          <mat-label>Método de Pago</mat-label>
+          <mat-select formControlName="metodo_de_pago" required>
+            <mat-option value="efectivo">Efectivo</mat-option>
+            <mat-option value="debito">Débito</mat-option>
+            <mat-option value="transferencia">Transferencia</mat-option>
+            <mat-option value="mixto">Mixto</mat-option>
+            <mat-option value="otro">Otro</mat-option>
+          </mat-select>
+        </mat-form-field>
+        }
         <mat-form-field class="w-full h-40">
           <mat-label>Observaciones</mat-label>
           <textarea matInput formControlName="observaciones" rows="3" style="resize: none"></textarea>
@@ -198,7 +210,8 @@
                     class="text-xs opacity-75 ml-1 flex-shrink-0">({{formatFileSize(selectedFiles[archivo.key].size)}})</span>
                   }
                   @else if (operacionForm.get(archivo.key + '_path')?.value) {
-                  <span class="text-xs opacity-75 ml-1 truncate">{{ getFileNameFromPath(operacionForm.get(archivo.key +
+                  <span class="text-xs opacity-75 ml-1 truncate">{{ getFileNameFromPath(operacionForm.get(archivo.key
+                    +
                     '_path')?.value) }}</span>
                   }
                   @else {

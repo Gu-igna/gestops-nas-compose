@@ -19,6 +19,7 @@ import { OperacionesService } from '../../../services/operaciones/operaciones.se
 import { EntitiesService, Entity } from '../../../services/entities/entities.service';
 import { SubcategoriasService, Subcategoria, Categoria, Concepto } from '../../../services/subcategorias/subcategorias.service';
 import { FileValidationService } from '../../../services/file-validation/file-validation.service';
+import { SnackbarService } from '../../../services/snackbar/snackbar.service';
 import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { FechaConfirmDialogComponent } from '../fecha-confirm-dialog/fecha-confirm-dialog.component';
 
@@ -109,6 +110,7 @@ export class OperacionFormDialogComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
   private subcategoriasService = inject(SubcategoriasService);
   private fileValidationService = inject(FileValidationService);
+  private snackbarService = inject(SnackbarService);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
 
@@ -364,8 +366,8 @@ export class OperacionFormDialogComponent implements OnInit {
       if (option === 'factura' && !/^\d{5}-\d{8}$/.test(control.value)) {
         return { invalidFacturaCodigo: true };
       }
-      if (option === 'boleta' && !/^\d+$/.test(control.value)) {
-        return { invalidBoletaCodigo: true };
+      if (option === 'boleta') {
+        return null
       }
       return null;
     };
@@ -491,23 +493,13 @@ export class OperacionFormDialogComponent implements OnInit {
           }
         },
         error: () => {
-          this.dialog.open(FechaConfirmDialogComponent, {
-            data: {
-              message: 'Error al crear la operación.',
-              showCancelButton: false
-            }
-          });
+          console.error('Error al crear la operación');
         }
       });
     } else {
       const changedValues = this.getChangedValues();
       if (Object.keys(changedValues).length === 0 && Object.keys(this.selectedFiles).length === 0) {
-        this.dialog.open(FechaConfirmDialogComponent, {
-          data: {
-            message: 'No hay cambios para guardar.',
-            showCancelButton: false
-          }
-        });
+        console.info('No hay cambios para guardar');
         this.loading = false;
         this.dialogRef.close();
         return;
@@ -530,12 +522,7 @@ export class OperacionFormDialogComponent implements OnInit {
           }
         },
         error: () => {
-          this.dialog.open(FechaConfirmDialogComponent, {
-            data: {
-              message: 'Error al actualizar la operación.',
-              showCancelButton: false
-            }
-          });
+          console.error('Error al actualizar la operación');
         }
       });
     }
@@ -611,13 +598,7 @@ export class OperacionFormDialogComponent implements OnInit {
         ).subscribe({
           next: () => this.dialogRef.close(this.originalOperacion || {}),
           error: (error) => {
-            console.error('Error al subir archivos en creación:', error);
-            this.dialog.open(FechaConfirmDialogComponent, {
-              data: {
-                message: 'Operación creada, pero ocurrió un error al subir los archivos.',
-                showCancelButton: false
-              }
-            });
+            console.warn('Operación creada, pero ocurrió un error al subir los archivos');
             this.dialogRef.close(this.originalOperacion || {});
           }
         });
@@ -645,12 +626,6 @@ export class OperacionFormDialogComponent implements OnInit {
           next: () => this.dialogRef.close(this.originalOperacion || {}),
           error: (error) => {
             console.error('Error al subir archivos:', error);
-            this.dialog.open(FechaConfirmDialogComponent, {
-              data: {
-                message: 'Operación actualizada, pero ocurrió un error al subir los archivos.',
-                showCancelButton: false
-              }
-            });
             this.dialogRef.close(this.originalOperacion || {});
           }
         });

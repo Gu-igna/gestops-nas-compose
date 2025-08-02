@@ -5,7 +5,7 @@ import { CustomSnackbarContentComponent, CustomSnackbarData } from '../../compon
 @Injectable({
   providedIn: 'root'
 })
-export class SnackbarService {
+export class  SnackbarService {
 
   constructor(private _snackBar: MatSnackBar) { }
 

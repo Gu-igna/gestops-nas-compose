@@ -19,12 +19,10 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           break;
           
         case 400:
-          const badRequestMsg = error.error?.error || error.error?.message || 'Datos inválidos en la solicitud';
-          snackbarService.showError(`Error en los datos: ${badRequestMsg}`);
+          snackbarService.showError('Datos inválidos en la solicitud');
           break;
           
         case 401:
-          console.log('Error 401 - Token con problemas:', error.error?.error || 'Token inválido');
           snackbarService.showWarning('Sesión expirada. Iniciando sesión nuevamente.');
           
           // Limpiar datos de autenticación
@@ -38,27 +36,22 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           
         case 403:
           // Prohibido - Sin permisos
-          console.log('Error 403 - Sin permisos para este recurso');
-          const forbiddenMsg = error.error?.error || 'No tienes permisos para realizar esta acción';
-          snackbarService.showWarning(forbiddenMsg);
+          snackbarService.showWarning('No tienes permisos para realizar esta acción');
           break;
           
         case 404:
           // No encontrado
-          const notFoundMsg = error.error?.error || 'Recurso no encontrado';
-          snackbarService.showError(`No encontrado: ${notFoundMsg}`);
+          snackbarService.showError('Recurso no encontrado');
           break;
           
         case 409:
           // Conflicto - Datos duplicados
-          const conflictMsg = error.error?.error || 'Conflicto con datos existentes';
-          snackbarService.showWarning(`Conflicto: ${conflictMsg}`);
+          snackbarService.showWarning('Conflicto con datos existentes');
           break;
           
         case 422:
           // Entidad no procesable - Errores de validación
-          const validationMsg = error.error?.error || 'Error de validación';
-          snackbarService.showWarning(`Validación: ${validationMsg}`);
+          snackbarService.showWarning('Error de validación');
           break;
           
         case 500:
@@ -78,8 +71,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           
         default:
           // Otros errores
-          const genericMsg = error.error?.error || error.error?.message || `Error HTTP ${error.status}`;
-          snackbarService.showError(`Error: ${genericMsg}`);
+          snackbarService.showError(`Error HTTP ${error.status}`);
       }
       
       return throwError(() => error);

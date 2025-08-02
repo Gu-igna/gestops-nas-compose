@@ -1,32 +1,19 @@
-<div
-    class="flex items-center justify-center w-full
-        [&.error_.custom-snackbar-icon]:text-orange-400
-        [&.error_.custom-snackbar-message]:text-orange-400
-        [&.warning_.custom-snackbar-icon]:text-red-500
-        [&.warning_.custom-snackbar-message]:text-red-500
+<div class="flex items-center justify-center w-full
+        [&.error_.custom-snackbar-icon]:text-red-500
+        [&.error_.custom-snackbar-message]:text-red-500
+        [&.warning_.custom-snackbar-icon]:text-orange-400
+        [&.warning_.custom-snackbar-message]:text-orange-400
         [&.info_.custom-snackbar-icon]:text-green-400
         [&.info_.custom-snackbar-message]:text-green-400
-        text-lg"
-    [ngClass]="data.type"
->
+        text-lg" [ngClass]="data.type">
     <span class="flex items-center justify-center flex-grow text-center">
-        <mat-icon class="custom-snackbar-icon text-[30px] w-9 mr-1">{{ data.icon }}</mat-icon>
+        <mat-icon class="custom-snackbar-icon text-[30px] h-[30px] w-[30px] mr-1">{{ data.icon }}</mat-icon>
         <span class="custom-snackbar-message">
             @if (data.message.includes('.')) {
-                {{ data.message.split('.')[0] }}.<br>{{ data.message.substring(data.message.indexOf('.') + 1) }}
+            {{ data.message.split('.')[0] }}.<br>{{ data.message.substring(data.message.indexOf('.') + 1) }}
             } @else {
-                <ng-template #normalMessage>
-                    {{ data.message }}
-                </ng-template>
+            {{ data.message }}
             }
-            <ng-template #normalMessage>
-                {{ data.message }}
-            </ng-template>
         </span>
     </span>
-    @if (data.actionText) {
-        <button mat-button (click)="snackBarRef.dismissWithAction()">
-            {{ data.actionText }}
-        </button>
-    }
 </div>

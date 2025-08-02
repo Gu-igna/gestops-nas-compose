@@ -110,9 +110,6 @@ class Operacion(db.Model):
         if self.option == 'factura':
             if not re.match(r'^\d{5}-\d{8}$', value):
                 raise ValueError("El código de factura debe tener el formato '#####-########'")
-        elif self.option == 'boleta':
-            if not value.isdigit():
-                raise ValueError("El código de boleta debe ser numérico")
                 
         return value
 

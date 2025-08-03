@@ -1,64 +1,61 @@
-<div class="flex flex-col items-center justify-center">
-
-    <div class="flex flex-col items-center justify-center pt-16 p-4 md:p-10 lg:p-20">
-        <div class="flex flex-col md:flex-row justify-between w-full max-w-sm md:max-w-4xl lg:max-w-6xl space-x-6">
-            <div class="h-[76px] pt-3 flex justify-center md:justify-start mb-4 md:mb-0">
-                <button mat-raised-button (click)="openConceptoFormDialog('create')">
-                    Crear Concepto
-                    <mat-icon>add_box</mat-icon>
-                </button>
-            </div>
-            <div class="w-full md:w-90">
-                <mat-form-field class="w-full">
-                    <mat-label>Filtrar</mat-label>
-                    <input matInput #filterInput (keyup)="applyFilter($event)" placeholder="Buscar por id o nombre">
-                </mat-form-field>
-            </div>
+<div class="flex flex-col items-center justify-center pt-16 p-4 md:p-10 lg:p-20">
+    
+    <div class="flex flex-col md:flex-row justify-between w-full max-w-sm md:max-w-4xl lg:max-w-6xl">
+        <div class="h-[76px] pt-3 flex justify-center md:justify-start mb-4 md:mb-0">
+            <button mat-raised-button (click)="openConceptoFormDialog('create')">
+                Crear Concepto
+                <mat-icon>add_box</mat-icon>
+            </button>
         </div>
-
-        <div class="overflow-x-auto w-full max-w-sm md:max-w-4xl lg:max-w-6xl mt-4">
-            <div class="mat-elevation-z8 min-w-full">
-                <table mat-table [dataSource]="dataSource" matSort class="shadow border-1 border-gray-500">
-                    <ng-container *ngFor="let col of columnsToDisplay" [matColumnDef]="col">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header [class]="headerColor">
-                            {{(col | titlecase)}}
-                        </th>
-                        <td mat-cell *matCellDef="let row"> {{row[col]}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef [class]="headerColor" class="w-31">Acciones</th>
-                        <td mat-cell *matCellDef="let row">
-                            <div class="flex items-center">
-                                <div class="flex-col justify-items-center">
-                                    <button mat-mini-fab class="bg-amber-500/65"
-                                        (click)="openConceptoFormDialog('update', row)">
-                                        <mat-icon>edit_squared_outlined</mat-icon>
-                                    </button>
-                                </div>
-                                <div class="flex-col ml-3 justify-items-center">
-                                    <button mat-mini-fab class="bg-red-500/75"
-                                        (click)="openDeleteConceptoDialog(row.id)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="columnsToDisplay.concat(['actions'])"></tr>
-                    <tr mat-row *matRowDef="let row; columns: columnsToDisplay.concat(['actions']); let even = even"
-                        [ngClass]="{'bg-gray-100': even, 'bg-white': !even}"></tr>
-
-                    <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell text-center" [attr.colspan]="columnsToDisplay.length + 1">
-                            No se encontraron resultados para "{{filterInput.value}}"
-                        </td>
-                    </tr>
-                </table>
-            </div>
+        <div class="w-full md:w-90">
+            <mat-form-field class="w-full">
+                <mat-label>Filtrar</mat-label>
+                <input matInput #filterInput (keyup)="applyFilter($event)" placeholder="Buscar por id o nombre">
+            </mat-form-field>
         </div>
-        <mat-paginator class="bg-gray-300 w-full max-w-sm md:max-w-4xl lg:max-w-6xl pt-2"
-            [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page of conceptos"></mat-paginator>
     </div>
+
+    <div class="overflow-x-auto w-full max-w-sm md:max-w-4xl lg:max-w-6xl mt-4">
+        <div class="mat-elevation-z8 min-w-full">
+            <table mat-table [dataSource]="dataSource" matSort class="shadow border-1 border-gray-500">
+                <ng-container *ngFor="let col of columnsToDisplay" [matColumnDef]="col">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header [class]="headerColor">
+                        {{(col | titlecase)}}
+                    </th>
+                    <td mat-cell *matCellDef="let row"> {{row[col]}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef [class]="headerColor" class="w-31">Acciones</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="flex items-center">
+                            <div class="flex-col justify-items-center">
+                                <button mat-mini-fab class="bg-amber-500/65"
+                                    (click)="openConceptoFormDialog('update', row)">
+                                    <mat-icon>edit_squared_outlined</mat-icon>
+                                </button>
+                            </div>
+                            <div class="flex-col ml-3 justify-items-center">
+                                <button mat-mini-fab class="bg-red-500/75" (click)="openDeleteConceptoDialog(row.id)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="columnsToDisplay.concat(['actions'])"></tr>
+                <tr mat-row *matRowDef="let row; columns: columnsToDisplay.concat(['actions']); let even = even"
+                    [ngClass]="{'bg-gray-100': even, 'bg-white': !even}"></tr>
+
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell text-center" [attr.colspan]="columnsToDisplay.length + 1">
+                        No se encontraron resultados para "{{filterInput.value}}"
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <mat-paginator class="bg-gray-300 w-full max-w-sm md:max-w-4xl lg:max-w-6xl pt-2"
+        [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page of conceptos"></mat-paginator>
 </div>

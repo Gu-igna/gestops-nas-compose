@@ -34,7 +34,7 @@ def validate_file(file, field_name):
     return True, 'Archivo válido'
 
 def procesar_archivo(file, upload_folder):
-    """Procesa y guarda un archivo validado"""
+    """Procesa y guarda un archivo validado - solo retorna el nombre del archivo"""
     filename = str(uuid.uuid4()) + '_' + secure_filename(file.filename)
     
     if not os.path.exists(upload_folder):
@@ -43,7 +43,8 @@ def procesar_archivo(file, upload_folder):
     file_path = os.path.join(upload_folder, filename)
     file.save(file_path)
     
-    return file_path, file.content_type
+    # Solo retornamos el nombre del archivo, no el path completo
+    return filename, file.content_type
 
 class ArchivoOperacion(Resource):
     @role_required(roles=["admin", "supervisor"])
@@ -53,12 +54,14 @@ class ArchivoOperacion(Resource):
             if not operacion:
                 return {'message': 'Operación no encontrada'}, 404
 
-            file_path = getattr(operacion, f"{campo_archivo}_path", None)
+            filename = getattr(operacion, f"{campo_archivo}_path", None)
 
-            if not file_path:
+            if not filename:
                 return {'message': f'El archivo {campo_archivo} no está registrado'}, 404
 
-            full_path = os.path.abspath(file_path)
+            # Construir el path completo usando la variable de entorno
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            full_path = os.path.join(upload_folder, filename)
 
             if not os.path.exists(full_path):
                 return {'message': f'El archivo {campo_archivo} no existe o no es accesible'}, 404
@@ -95,9 +98,9 @@ class ArchivoOperacion(Resource):
             if campo_archivo not in campos_validos:
                 return {'message': f'Campo de archivo "{campo_archivo}" no permitido'}, 400
 
-            old_path = getattr(operacion, f"{campo_archivo}_path", None)
-            self._eliminar_archivo_si_existe(old_path)
-            if old_path:
+            filename = getattr(operacion, f"{campo_archivo}_path", None)
+            if filename:
+                self._eliminar_archivo_si_existe(filename)
                 setattr(operacion, f"{campo_archivo}_path", None)
                 setattr(operacion, f"{campo_archivo}_tipo", None)
                 db.session.commit()
@@ -109,10 +112,13 @@ class ArchivoOperacion(Resource):
             db.session.rollback()
             return {'message': 'Error al eliminar el archivo', 'error': str(e)}, 500
 
-    def _eliminar_archivo_si_existe(self, ruta_archivo):
-        if ruta_archivo and os.path.exists(ruta_archivo):
-            os.remove(ruta_archivo)
-
+    def _eliminar_archivo_si_existe(self, filename):
+        """Elimina el archivo físico usando el filename y la variable de entorno"""
+        if filename:
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            full_path = os.path.join(upload_folder, filename)
+            if os.path.exists(full_path):
+                os.remove(full_path)
 
     @role_required(roles=["admin", "supervisor"])
     def patch(self, id_operacion, campo_archivo):
@@ -127,7 +133,6 @@ class ArchivoOperacion(Resource):
 
             es_creador = int(operacion.id_usuario) == int(usuario_actual_id)
             es_supervisor = "supervisor" == str(usuario_actual.rol)
-
 
             if not (es_creador or es_supervisor):
                 return {'message': 'No tienes permiso para editar esta operación'}, 403
@@ -153,14 +158,16 @@ class ArchivoOperacion(Resource):
                 return {'message': validation_message}, 400
 
             if file and file.filename:
-                old_path = getattr(operacion, f"{campo_archivo}_path")
-                if old_path and os.path.exists(old_path):
-                    os.remove(old_path)
+                # Eliminar archivo anterior si existe
+                old_filename = getattr(operacion, f"{campo_archivo}_path")
+                if old_filename:
+                    self._eliminar_archivo_si_existe(old_filename)
 
                 upload_folder = current_app.config['UPLOAD_FOLDER']
-                file_path, content_type = procesar_archivo(file, upload_folder)
+                filename, content_type = procesar_archivo(file, upload_folder)
 
-                setattr(operacion, f"{campo_archivo}_path", file_path)
+                # Guardar solo el nombre del archivo, no el path completo
+                setattr(operacion, f"{campo_archivo}_path", filename)
                 setattr(operacion, f"{campo_archivo}_tipo", content_type)
 
                 db.session.commit()
@@ -191,10 +198,11 @@ class ArchivosOperaciones(Resource):
             for campo in campos_archivo:
                 if campo in request.files:
                     try:
-                        file_path, content_type = self._procesar_archivo(campo)
-                        setattr(operacion, f"{campo}_path", file_path)
-                        setattr(operacion, f"{campo}_tipo", content_type)
-                        archivos_procesados.append(campo)
+                        filename, content_type = self._procesar_archivo(campo)
+                        if filename:  # Solo si se procesó correctamente
+                            setattr(operacion, f"{campo}_path", filename)
+                            setattr(operacion, f"{campo}_tipo", content_type)
+                            archivos_procesados.append(campo)
                     except ValueError as e:
                         return {'message': str(e)}, 400
             

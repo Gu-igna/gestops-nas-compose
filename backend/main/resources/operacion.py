@@ -25,8 +25,18 @@ class Operacion(Resource):
             
             operacion  = db.session.query(OperacionModel).get_or_404(id)
             
+            # Obtener el concepto de forma segura
+            concepto_nombre = 'No definido'
+            try:
+                if (operacion.subcategoria and 
+                    operacion.subcategoria.categoria and 
+                    operacion.subcategoria.categoria.concepto):
+                    concepto_nombre = operacion.subcategoria.categoria.concepto.nombre
+            except AttributeError:
+                concepto_nombre = 'Error al obtener concepto'
+            
             logger.info(f"Operación {id} encontrada exitosamente", extra={
-                'extra_data': {'operacion_id': id, 'concepto': operacion.concepto}
+                'extra_data': {'operacion_id': id, 'concepto': concepto_nombre}
             })
             
             return operacion.to_json(), 200
@@ -59,9 +69,14 @@ class Operacion(Resource):
             db.session.rollback()
             return {'message': 'Error al eliminar la operación', 'error': str(e)}, 500
     
-    def _eliminar_archivo_si_existe(self, ruta_archivo):
-        if ruta_archivo and os.path.exists(ruta_archivo):
-            os.remove(ruta_archivo)
+    def _eliminar_archivo_si_existe(self, filename):
+        """Elimina el archivo físico usando el filename y la variable de entorno"""
+        if filename:
+            from flask import current_app
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            full_path = os.path.join(upload_folder, filename)
+            if os.path.exists(full_path):
+                os.remove(full_path)
 
     @role_required(roles=["admin", "supervisor"])
     def patch(self, id):
@@ -270,9 +285,7 @@ class Operaciones(Resource):
                 ),
                 OperacionModel.subcategoria.has(
                     SubcategoriaModel.categoria.has(
-                        CategoriaModel.concepto.has(
-                            ConceptoModel.nombre.like(f"%{t}%")
-                        )
+                        ConceptoModel.nombre.like(f"%{t}%")
                     )
                 ),
                 OperacionModel.usuario.has(

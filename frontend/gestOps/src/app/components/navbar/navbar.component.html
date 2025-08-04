@@ -1,6 +1,6 @@
 <div>
-    <!-- Desktop Navigation (tu diseño original) -->
-    <nav class="fixed w-full flex-row bg-white shadow-md hidden lg:flex">
+    <!-- Desktop Navigation -->
+    <nav class="fixed top-0 left-0 right-0 w-full flex-row bg-white shadow-md hidden lg:flex z-50">
         <nav mat-tab-nav-bar class="basis-5/6 bg-white" [tabPanel]="tabPanel">
             @for (route of mainRoutes; track $index) {
             <a mat-tab-link [routerLink]="'/' + route.path" routerLinkActive #rla="routerLinkActive"
@@ -21,28 +21,26 @@
         </div>
     </nav>
 
-<!-- Mobile Header - Navegación principal -->
-<nav class="fixed w-full lg:hidden bg-white shadow-md h-16">
-    <div class="flex justify-around items-center h-full">
-        @for (route of mainRoutes; track $index) {
-        <div class="flex-1 h-full" [routerLinkActive]="'bg-[var(--mat-sys-on-primary-fixed-variant)]/50'">
-            <a [routerLink]="'/' + route.path" routerLinkActive="text-white"
-                class="flex items-center justify-center w-full h-full relative">
+    <!-- Mobile Header - Navegación principal -->
+    <nav class="fixed top-0 left-0 right-0 w-full lg:hidden bg-white shadow-md h-16 z-50">
+        <div class="flex justify-around items-center h-full">
+            @for (route of mainRoutes; track $index) {
+            <a [routerLink]="'/' + route.path"
+                routerLinkActive="bg-[var(--mat-sys-on-primary-fixed-variant)]/50 text-white"
+                class="flex-1 h-full flex items-center justify-center relative">
                 <mat-icon class="text-[36px] h-[36px] w-[36px]">{{route.icon}}</mat-icon>
             </a>
+            }
+
+            <!-- Botón de logout en el header -->
+            <button (click)="logout()" class="flex-1 h-full flex items-center justify-center
+                           text-[var(--mat-sys-primary)] 
+                           hover:bg-[var(--mat-sys-primary)]/[0.10] 
+                           active:bg-[var(--mat-sys-primary)]/[0.20]
+                           transition-all duration-200 ease-out">
+                <mat-icon class="text-[36px] h-[36px] w-[36px]">logout</mat-icon>
+            </button>
         </div>
-        }
+    </nav>
 
-        <!-- Botón de logout en el header -->
-        <button (click)="logout()" class="flex items-center justify-center flex-1 h-full
-           text-[var(--mat-sys-primary)] 
-           hover:bg-[var(--mat-sys-primary)]/[0.10] 
-           active:bg-[var(--mat-sys-primary)]/[0.20]
-           transition-all duration-200 ease-out">
-            <mat-icon class="text-[36px] h-[36px] w-[36px]">logout</mat-icon>
-        </button>
-    </div>
-</nav>
-
-    <!-- Espaciado para contenido -->
-    <div class="pt-20 lg:pt-12 pb-20 lg:pb-12"></div>
+</div>

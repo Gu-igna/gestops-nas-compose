@@ -9,7 +9,9 @@ import {
 } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { startWith } from 'rxjs/operators';
+import { startWith, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 import {
   CategoriasService,
@@ -39,7 +41,8 @@ function idConceptoValido(conceptos: Concepto[]): ValidatorFn {
     MatInputModule,
     MatFormFieldModule,
     MatAutocompleteModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AsyncPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './categoria-form-dialog.component.html',
@@ -52,6 +55,7 @@ export class CategoriaFormDialogComponent implements OnInit {
   mode: 'create' | 'update';
 
   conceptos = signal<Concepto[]>([]);
+  filteredConceptos!: Observable<Concepto[]>;
   totalConceptos = 0;
 
   categoriaForm = signal(
@@ -88,19 +92,6 @@ export class CategoriaFormDialogComponent implements OnInit {
 
   ngOnInit() {
     this.loadConceptos();
-
-    const conceptoTextControl = this.categoriaForm().get('conceptoText');
-    const idConceptoControl = this.categoriaForm().get('id_concepto');
-
-    conceptoTextControl?.valueChanges.pipe(
-      startWith(''),
-    ).subscribe(value => {
-      if (typeof value === 'object' && value !== null && 'id' in value) {
-        idConceptoControl?.setValue(value.id);
-      } else {
-        idConceptoControl?.setValue(0);
-      }
-    });
   }
 
   loadConceptos() {
@@ -118,6 +109,9 @@ export class CategoriaFormDialogComponent implements OnInit {
           ]);
           idConceptoControl.updateValueAndValidity();
         }
+
+        // Configurar el filtrado después de cargar los conceptos
+        this.setupConceptoFiltering();
       },
       error: (err) => {
         console.error('Error al cargar conceptos', err.message);
@@ -126,8 +120,41 @@ export class CategoriaFormDialogComponent implements OnInit {
     });
   }
 
+  private setupConceptoFiltering() {
+    const conceptoTextControl = this.categoriaForm().get('conceptoText');
+    const idConceptoControl = this.categoriaForm().get('id_concepto');
+
+    // Configurar el filtrado de conceptos
+    this.filteredConceptos = conceptoTextControl!.valueChanges.pipe(
+      startWith(conceptoTextControl!.value || ''),
+      map(value => this._filterConceptos(value))
+    );
+
+    conceptoTextControl?.valueChanges.pipe(
+      startWith(conceptoTextControl!.value || ''),
+    ).subscribe(value => {
+      if (typeof value === 'object' && value !== null && 'id' in value) {
+        idConceptoControl?.setValue(value.id);
+      } else {
+        idConceptoControl?.setValue(0);
+      }
+    });
+  }
+
   displayFn(concepto: Concepto): string {
     return concepto ? concepto.nombre : '';
+  }
+
+  private _filterConceptos(value: string | Concepto | null): Concepto[] {
+    if (!value) {
+      return this.conceptos();
+    }
+    
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : value.nombre.toLowerCase();
+    
+    return this.conceptos().filter(concepto => 
+      concepto.nombre.toLowerCase().includes(filterValue)
+    );
   }
 
   save() {

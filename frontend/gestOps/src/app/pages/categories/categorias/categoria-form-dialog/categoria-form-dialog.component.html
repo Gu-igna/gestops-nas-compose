@@ -16,7 +16,7 @@
           <mat-error>Debe seleccionar un concepto válido del listado</mat-error>
         }
         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-          @for (concepto of conceptos(); track concepto.id) {
+          @for (concepto of filteredConceptos | async; track concepto.id) {
           <mat-option [value]="concepto">{{ concepto.nombre }}</mat-option>
           }
         </mat-autocomplete>

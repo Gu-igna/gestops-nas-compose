@@ -9,7 +9,9 @@ import {
 } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { startWith } from 'rxjs/operators';
+import { startWith, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 import {
   SubcategoriasService,
@@ -48,7 +50,8 @@ function idConceptoValido(conceptos: Concepto[]): ValidatorFn {
     MatInputModule,
     MatFormFieldModule,
     MatAutocompleteModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AsyncPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './subcategoria-form-dialog.component.html',
@@ -62,8 +65,11 @@ export class SubcategoriaFormDialogComponent implements OnInit {
 
   conceptos = signal<Concepto[]>([]);
   categorias = signal<Categoria[]>([]);
+  filteredConceptos!: Observable<Concepto[]>;
   filteredCategorias = signal<Categoria[]>([]);
+  filteredCategoriasObservable!: Observable<Categoria[]>;
   selectedConceptoId = signal<number>(0);
+  isInitialLoad = true;
 
   totalCategorias = 0;
 
@@ -111,38 +117,6 @@ export class SubcategoriaFormDialogComponent implements OnInit {
   ngOnInit() {
     this.loadConceptos();
     this.loadCategorias();
-
-    const conceptoTextControl = this.subCategoriaForm().get('conceptoText');
-    const idConceptoControl = this.subCategoriaForm().get('id_concepto');
-    const categoriaTextControl = this.subCategoriaForm().get('categoriaText');
-    const idCategoriaControl = this.subCategoriaForm().get('id_categoria');
-
-    conceptoTextControl?.valueChanges.pipe(
-      startWith(''),
-    ).subscribe(value => {
-      if (typeof value === 'object' && value !== null && 'id' in value) {
-        idConceptoControl?.setValue(value.id);
-        this.selectedConceptoId.set(value.id);
-        this.filterCategoriasByConcepto(value.id);
-
-        categoriaTextControl?.setValue(null);
-        idCategoriaControl?.setValue(0);
-      } else {
-        idConceptoControl?.setValue(0);
-        this.selectedConceptoId.set(0);
-        this.filteredCategorias.set([]);
-      }
-    });
-
-    categoriaTextControl?.valueChanges.pipe(
-      startWith(''),
-    ).subscribe(value => {
-      if (typeof value === 'object' && value !== null && 'id' in value) {
-        idCategoriaControl?.setValue(value.id);
-      } else {
-        idCategoriaControl?.setValue(0);
-      }
-    });
   }
 
   loadConceptos() {
@@ -160,6 +134,9 @@ export class SubcategoriaFormDialogComponent implements OnInit {
           ]);
           idConceptoControl.updateValueAndValidity();
         }
+
+        // Configurar el filtrado de conceptos después de cargar
+        this.setupConceptoFiltering();
       },
       error: (err) => {
         console.error('Error al cargar conceptos', err.message);
@@ -186,6 +163,25 @@ export class SubcategoriaFormDialogComponent implements OnInit {
 
         if (this.selectedConceptoId() > 0) {
           this.filterCategoriasByConcepto(this.selectedConceptoId());
+          // Pequeño retraso para asegurar que el filtrado se complete antes de configurar el observable
+          setTimeout(() => {
+            this.setupCategoriaFiltering();
+            // Trigger la actualización del observable con el valor inicial
+            if (this.mode === 'update') {
+              const categoriaTextControl = this.subCategoriaForm().get('categoriaText');
+              if (categoriaTextControl && categoriaTextControl.value) {
+                setTimeout(() => {
+                  this.filteredCategoriasObservable = categoriaTextControl.valueChanges.pipe(
+                    startWith(categoriaTextControl.value),
+                    map(value => this._filterCategorias(value))
+                  );
+                }, 10);
+              }
+            }
+          }, 0);
+        } else {
+          // Configurar el filtrado de categorías después de cargar
+          this.setupCategoriaFiltering();
         }
       },
       error: (err) => {
@@ -200,12 +196,102 @@ export class SubcategoriaFormDialogComponent implements OnInit {
     this.filteredCategorias.set(filtered);
   }
 
+  private setupConceptoFiltering() {
+    const conceptoTextControl = this.subCategoriaForm().get('conceptoText');
+    const idConceptoControl = this.subCategoriaForm().get('id_concepto');
+    const categoriaTextControl = this.subCategoriaForm().get('categoriaText');
+    const idCategoriaControl = this.subCategoriaForm().get('id_categoria');
+
+    // Configurar el filtrado de conceptos
+    this.filteredConceptos = conceptoTextControl!.valueChanges.pipe(
+      startWith(conceptoTextControl!.value || ''),
+      map(value => this._filterConceptos(value))
+    );
+
+    conceptoTextControl?.valueChanges.pipe(
+      startWith(conceptoTextControl!.value || ''),
+    ).subscribe(value => {
+      if (typeof value === 'object' && value !== null && 'id' in value) {
+        idConceptoControl?.setValue(value.id);
+        this.selectedConceptoId.set(value.id);
+        this.filterCategoriasByConcepto(value.id);
+
+        // Solo resetear la categoría si no es la carga inicial o no estamos en modo editar
+        if (!this.isInitialLoad || this.mode === 'create') {
+          categoriaTextControl?.setValue(null);
+          idCategoriaControl?.setValue(0);
+        }
+        
+        // Marcar que ya no es la carga inicial después del primer cambio
+        if (this.isInitialLoad) {
+          this.isInitialLoad = false;
+        }
+      } else {
+        idConceptoControl?.setValue(0);
+        this.selectedConceptoId.set(0);
+        this.filteredCategorias.set([]);
+      }
+    });
+  }
+
+  private setupCategoriaFiltering() {
+    const categoriaTextControl = this.subCategoriaForm().get('categoriaText');
+    const idCategoriaControl = this.subCategoriaForm().get('id_categoria');
+
+    // Configurar el filtrado de categorías
+    this.filteredCategoriasObservable = categoriaTextControl!.valueChanges.pipe(
+      startWith(categoriaTextControl!.value || ''),
+      map(value => this._filterCategorias(value))
+    );
+
+    categoriaTextControl?.valueChanges.pipe(
+      startWith(categoriaTextControl!.value || ''),
+    ).subscribe(value => {
+      if (typeof value === 'object' && value !== null && 'id' in value) {
+        idCategoriaControl?.setValue(value.id);
+      } else {
+        idCategoriaControl?.setValue(0);
+      }
+    });
+
+    // Si estamos en modo editar, necesitamos trigger el filtrado inicial
+    if (this.mode === 'update' && categoriaTextControl!.value) {
+      setTimeout(() => {
+        categoriaTextControl!.updateValueAndValidity();
+      }, 0);
+    }
+  }
+
   displayConceptoFn(concepto: Concepto): string {
     return concepto ? concepto.nombre : '';
   }
 
   displayCategoriaFn(categoria: Categoria): string {
     return categoria ? categoria.nombre : '';
+  }
+
+  private _filterConceptos(value: string | Concepto | null): Concepto[] {
+    if (!value) {
+      return this.conceptos();
+    }
+    
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : value.nombre.toLowerCase();
+    
+    return this.conceptos().filter(concepto => 
+      concepto.nombre.toLowerCase().includes(filterValue)
+    );
+  }
+
+  private _filterCategorias(value: string | Categoria | null): Categoria[] {
+    if (!value) {
+      return this.filteredCategorias();
+    }
+    
+    const filterValue = typeof value === 'string' ? value.toLowerCase() : value.nombre.toLowerCase();
+    
+    return this.filteredCategorias().filter(categoria => 
+      categoria.nombre.toLowerCase().includes(filterValue)
+    );
   }
 
   save() {

@@ -16,7 +16,7 @@
                 <mat-error>Debe seleccionar un concepto válido del listado</mat-error>
                 }
                 <mat-autocomplete #autoConcepto="matAutocomplete" [displayWith]="displayConceptoFn">
-                    @for (concepto of conceptos(); track concepto.id) {
+                    @for (concepto of filteredConceptos | async; track concepto.id) {
                     <mat-option [value]="concepto">{{ concepto.nombre }}</mat-option>
                     }
                 </mat-autocomplete>
@@ -32,7 +32,7 @@
                 <mat-error>Debe seleccionar una categoría válida del listado</mat-error>
                 }
                 <mat-autocomplete #autoCategoria="matAutocomplete" [displayWith]="displayCategoriaFn">
-                    @for (categoria of filteredCategorias(); track categoria.id) {
+                    @for (categoria of filteredCategoriasObservable | async; track categoria.id) {
                     <mat-option [value]="categoria">{{ categoria.nombre }}</mat-option>
                     }
                 </mat-autocomplete>

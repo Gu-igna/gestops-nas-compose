@@ -12,14 +12,56 @@ db = SQLAlchemy()
 jwt = JWTManager()
 mailsender = Mail()
 
+def configure_cors(app):
+    """
+    Configuración CORS segura y restrictiva
+    Solo permite acceso desde el frontend Angular y durante desarrollo
+    """
+    # Obtener URLs permitidas desde variables de entorno
+    frontend_url = os.getenv('FRONTEND_URL')
+    environment = os.getenv('ENVIRONMENT')
+    
+    # Lista de orígenes permitidos
+    allowed_origins = []
+    
+    if environment == 'development':
+        # En desarrollo: permitir localhost en diferentes puertos
+        allowed_origins = [
+            'http://localhost:4200',
+            'http://127.0.0.1:4200',
+            'http://localhost:8080',
+            'http://127.0.0.1:8080',
+            '/api',
+        ]
+    elif environment == 'production':
+        if frontend_url:
+            allowed_origins = [frontend_url]
+        docker_frontend = os.getenv('DOCKER_FRONTEND_URL')
+        if docker_frontend:
+            allowed_origins.append(docker_frontend)
+    
+    CORS(app, 
+         origins=allowed_origins,
+         methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+         allow_headers=[
+             'Content-Type',
+             'Authorization',
+             'Access-Control-Allow-Credentials'
+         ],
+         supports_credentials=True,
+         max_age=3600
+    )
+    
+    app.logger.info(f"CORS configurado para: {allowed_origins}")
+
 def create_app():
     app = Flask(__name__)
     
     load_dotenv()
 
-    # Configure CORS using environment variable
-    frontend_url = os.getenv('FRONTEND_URL')
-    CORS(app, origins=[frontend_url])
+
+    # Configuración CORS segura y restrictiva
+    configure_cors(app)
 
     if not os.path.exists(os.getenv('DATABASE_PATH')+os.getenv('DATABASE_NAME')):
         os.mknod(os.getenv('DATABASE_PATH')+os.getenv('DATABASE_NAME'))

@@ -21,7 +21,6 @@ class Operacion(db.Model):
     personas = db.relationship("Persona", back_populates="operaciones", single_parent=True)
 
     comprobante_path = db.Column(db.String(255), nullable=True)
-    comprobante_tipo = db.Column(db.String(10), nullable=True)
 
     option = db.Column(db.String(10), nullable=False)
     codigo = db.Column(db.String(10), nullable=False)
@@ -37,11 +36,8 @@ class Operacion(db.Model):
 
 
     archivo1_path = db.Column(db.String(255), nullable=True)
-    archivo1_tipo = db.Column(db.String(10), nullable=True)
     archivo2_path = db.Column(db.String(255), nullable=True)
-    archivo2_tipo = db.Column(db.String(10), nullable=True)
     archivo3_path = db.Column(db.String(255), nullable=True)
-    archivo3_tipo = db.Column(db.String(10), nullable=True)
 
     modificado_por_otro = db.Column(db.Boolean, nullable=False, default=False)
     
@@ -155,6 +151,12 @@ class Operacion(db.Model):
         }
         return operacion_json
 
+    def get_file_extension(self, file_path):
+        """Obtiene la extensión del archivo desde la ruta"""
+        if not file_path:
+            return None
+        return file_path.split('.')[-1].lower() if '.' in file_path else None
+
 
     def to_excel(self):
         operacion_json = {
@@ -165,7 +167,6 @@ class Operacion(db.Model):
             "Naturaleza": self.naturaleza,
             "Cuit": self.personas.cuit,
             "Razón social": self.personas.razon_social,
-            "Tipo de comprobante": self.option,
             "Número de comprobante": self.codigo,
             "Observaciones": self.observaciones,
             "Método de pago": self.metodo_de_pago,
@@ -186,8 +187,6 @@ class Operacion(db.Model):
         caracter=operacion_json.get("caracter"),
         naturaleza=operacion_json.get("naturaleza"),
         id_persona=operacion_json.get("id_persona"),
-        comprobante_path=operacion_json.get("comprobante_path"),
-        comprobante_tipo=operacion_json.get("comprobante_tipo"),
         option=operacion_json.get("option"),
         codigo=operacion_json.get("codigo"),
         observaciones=operacion_json.get("observaciones"),
@@ -196,11 +195,8 @@ class Operacion(db.Model):
         id_subcategoria=operacion_json.get("id_subcategoria"),
         id_usuario=operacion_json.get("id_usuario"),
         archivo1_path=operacion_json.get("archivo1_path"),
-        archivo1_tipo=operacion_json.get("archivo1_tipo"),
         archivo2_path=operacion_json.get("archivo2_path"),
-        archivo2_tipo=operacion_json.get("archivo2_tipo"),
         archivo3_path=operacion_json.get("archivo3_path"),
-        archivo3_tipo=operacion_json.get("archivo3_tipo"),
         modificado_por_otro=operacion_json.get("modificado_por_otro", False),
         return Operacion(
                     id = id,
@@ -209,8 +205,6 @@ class Operacion(db.Model):
                     caracter = caracter,
                     naturaleza = naturaleza,
                     id_persona = id_persona,
-                    comprobante_path = comprobante_path,
-                    comprobante_tipo = comprobante_tipo,
                     option = option,
                     codigo = codigo,
                     observaciones = observaciones,
@@ -219,10 +213,7 @@ class Operacion(db.Model):
                     id_subcategoria = id_subcategoria,
                     id_usuario = id_usuario,
                     archivo1_path = archivo1_path,
-                    archivo1_tipo = archivo1_tipo,
                     archivo2_path = archivo2_path,
-                    archivo2_tipo = archivo2_tipo,
                     archivo3_path = archivo3_path,
-                    archivo3_tipo = archivo3_tipo,
                     modificado_por_otro = modificado_por_otro
                     )

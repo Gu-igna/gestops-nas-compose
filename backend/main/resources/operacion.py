@@ -308,7 +308,6 @@ class Operaciones(Resource):
                 naturaleza=request.json.get('naturaleza'),
                 id_persona=request.json.get('id_persona'),
                 comprobante_path=None,
-                comprobante_tipo=None,
                 option=request.json.get('option'),
                 codigo=request.json.get('codigo'),
                 observaciones=request.json.get('observaciones'),

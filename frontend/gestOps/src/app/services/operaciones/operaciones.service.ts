@@ -202,7 +202,6 @@ export interface Operacion {
   naturaleza: string;
   id_persona: number;
   comprobante_path?: string | null;
-  comprobante_tipo?: string;
   option: string;
   codigo: string;
   observaciones?: string;
@@ -211,11 +210,8 @@ export interface Operacion {
   id_subcategoria: number;
   id_usuario: number;
   archivo1_path?: string | null;
-  archivo1_tipo?: string;
   archivo2_path?: string | null;
-  archivo2_tipo?: string;
   archivo3_path?: string | null;
-  archivo3_tipo?: string;
   modificado_por_otro: boolean;
   persona?: any;
   subcategoria?: any;

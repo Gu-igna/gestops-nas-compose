@@ -2,7 +2,6 @@ from .. import mailsender
 from flask import current_app, render_template
 from flask_mail import Message
 from smtplib import SMTPException
-import logging
 
 def sendMail(to, subject, template, **kwargs):
     
@@ -16,6 +15,5 @@ def sendMail(to, subject, template, **kwargs):
         msg.html = render_template(template + '.html', **kwargs)
         mailsender.send(msg)
     except SMTPException as e:
-        logging.error(f"Mail delivery failed: {str(e)}")
         return "El envío del correo falló"
     return True

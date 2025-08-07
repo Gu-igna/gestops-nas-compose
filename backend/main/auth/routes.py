@@ -4,7 +4,6 @@ from main.models import UsuarioModel
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity, decode_token
 from main.auth.decorators import role_required
 from main.mail.functions import sendMail
-from main.config.logging_config import get_logger
 from datetime import timedelta
 import secrets
 import os
@@ -86,13 +85,6 @@ def forgot_password():
         return {'message': '...'}, 200
         
     except Exception as error:
-        auth_logger = get_logger('auth')
-        auth_logger.error("Error en forgot_password", extra={
-            'extra_data': {
-                'email': email,
-                'error_type': type(error).__name__
-            }
-        }, exc_info=True)
         return {'error': 'Ocurrió un error al procesar la solicitud'}, 500
 
 
@@ -168,10 +160,4 @@ def update_password():
 
     except Exception as e:
         db.session.rollback()
-        auth_logger = get_logger('auth')
-        auth_logger.error("Error al actualizar la contraseña", extra={
-            'extra_data': {
-                'error_type': type(e).__name__
-            }
-        }, exc_info=True)
         return {'error': 'Token inválido, expirado o error interno'}, 500

@@ -102,7 +102,6 @@ class ArchivoOperacion(Resource):
             if filename:
                 self._eliminar_archivo_si_existe(filename)
                 setattr(operacion, f"{campo_archivo}_path", None)
-                setattr(operacion, f"{campo_archivo}_tipo", None)
                 db.session.commit()
                 return {'message': f'Archivo "{campo_archivo}" eliminado correctamente'}, 200
 
@@ -168,7 +167,6 @@ class ArchivoOperacion(Resource):
 
                 # Guardar solo el nombre del archivo, no el path completo
                 setattr(operacion, f"{campo_archivo}_path", filename)
-                setattr(operacion, f"{campo_archivo}_tipo", content_type)
 
                 db.session.commit()
 

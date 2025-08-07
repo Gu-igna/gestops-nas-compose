@@ -4,7 +4,6 @@ from .. import db
 from sqlalchemy import or_
 from main.models import SubcategoriaModel
 from main.auth.decorators import role_required
-from main.config.logging_config import get_logger
 
 class Subcategoria(Resource):
     @role_required(roles=["admin", "supervisor"])
@@ -115,14 +114,6 @@ class Subcategorias(Resource):
                 try:
                     filtros.append(campos_busqueda[campo](valor))
                 except Exception as e:
-                    logger = get_logger('subcategoria')
-                    logger.warning("Error aplicando filtro de búsqueda", extra={
-                        'extra_data': {
-                            'campo': campo,
-                            'valor': valor,
-                            'error_type': type(e).__name__
-                        }
-                    })
                     continue
         return filtros
 

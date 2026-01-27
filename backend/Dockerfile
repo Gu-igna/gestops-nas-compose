@@ -4,6 +4,9 @@ FROM python:3.12-slim
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
+# Instala curl para healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Copia el archivo de requisitos e instala las dependencias
 # Esto se hace primero para aprovechar el cache de Docker si requirements.txt no cambia
 COPY requirements.txt ./

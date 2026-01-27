@@ -63,12 +63,15 @@ def create_app():
     # Configuración CORS segura y restrictiva
     configure_cors(app)
 
-    if not os.path.exists(os.getenv('DATABASE_PATH')+os.getenv('DATABASE_NAME')):
-        os.mknod(os.getenv('DATABASE_PATH')+os.getenv('DATABASE_NAME'))
-
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # Database configuration URL
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+os.getenv('DATABASE_PATH')+os.getenv('DATABASE_NAME')
+
+    # Database configuration URL para MariaDB
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASSWORD')
+    db_host = os.getenv('DB_HOST')
+    db_port = os.getenv('DB_PORT')
+    db_name = os.getenv('DB_NAME')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
     
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
 

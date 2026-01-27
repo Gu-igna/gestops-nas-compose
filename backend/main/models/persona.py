@@ -3,7 +3,7 @@ import re
 
 class Persona(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cuit = db.Column(db.Integer, nullable=False, unique=True)
+    cuit = db.Column(db.BigInteger, nullable=False, unique=True)
     razon_social = db.Column(db.String(255), nullable=False)
 
     operaciones = db.relationship("Operacion", back_populates="personas")

@@ -36,9 +36,11 @@ def configure_cors(app):
             allowed_origins = [
                 'http://localhost:8080',
                 'http://127.0.0.1:8080',
-                'http://192.168.1.111:8080'
-        ]
-        docker_frontend = os.getenv('DOCKER_FRONTEND_URL')
+                'http://192.168.1.111:8080',
+                frontend_url
+            ]
+            docker_frontend = os.getenv('DOCKER_FRONTEND_URL')
+
         if docker_frontend:
             allowed_origins.append(docker_frontend)
     

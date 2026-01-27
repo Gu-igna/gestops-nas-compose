@@ -2,10 +2,10 @@ services:
   mariadb:
     image: mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_NAME:-gestops}
-      MYSQL_USER: ${DB_USER:-gestops_user}
-      MYSQL_PASSWORD: ${DB_USER_PASSWORD:-gestops_pass}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD}
     volumes:
       - /srv/dev-disk-by-uuid-e1688f1c-ca8f-4b9e-bbc1-32aef67f601b/Datos/mariadb_data:/var/lib/mysql
     networks:

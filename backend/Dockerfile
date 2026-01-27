@@ -19,4 +19,4 @@ COPY . .
 # Comando para iniciar la aplicación Flask con Gunicorn
 # Asume que tu aplicación Flask se inicializa como 'app' en 'app.py'
 # dentro del directorio raíz del backend (que ahora es /app en el contenedor)
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "app:app"]

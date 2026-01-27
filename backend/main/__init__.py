@@ -27,15 +27,17 @@ def configure_cors(app):
     if environment == 'development':
         # En desarrollo: permitir localhost en diferentes puertos
         allowed_origins = [
-            'http://localhost:4200',
-            'http://127.0.0.1:4200',
             'http://localhost:8080',
             'http://127.0.0.1:8080',
             '/api',
         ]
     elif environment == 'production':
         if frontend_url:
-            allowed_origins = [frontend_url]
+            allowed_origins = [
+                'http://localhost:8080',
+                'http://127.0.0.1:8080',
+                'http://192.168.1.111:8080'
+        ]
         docker_frontend = os.getenv('DOCKER_FRONTEND_URL')
         if docker_frontend:
             allowed_origins.append(docker_frontend)

@@ -2,7 +2,7 @@ from .. import db
 
 class Concepto(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.String, nullable=False, unique=True)
+    nombre = db.Column(db.String(255), nullable=False, unique=True)
     
     categorias = db.relationship("Categoria", back_populates="concepto")
 

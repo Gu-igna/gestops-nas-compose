@@ -10,7 +10,7 @@ class Usuario(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100) ,nullable=False)
     email = db.Column(db.String(150), unique=True, index=True, nullable=False)
-    password = db.Column(db.String, nullable=True)
+    password = db.Column(db.String(255), nullable=True)
     rol = db.Column(db.String(20), nullable=True)
 
     operaciones = db.relationship("Operacion", back_populates="usuario")

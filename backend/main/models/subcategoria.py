@@ -2,7 +2,7 @@ from .. import db
 
 class Subcategoria(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.String, nullable=False)
+    nombre = db.Column(db.String(255), nullable=False)
 
     id_categoria = db.Column(db.Integer, db.ForeignKey("categoria.id"), nullable=False)
     categoria = db.relationship("Categoria", back_populates="subcategorias")

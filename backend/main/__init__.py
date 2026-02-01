@@ -34,6 +34,7 @@ def configure_cors(app):
     elif environment == 'production':
         if frontend_url:
             allowed_origins = [
+                frontend_url,
                 'http://localhost:8080',
                 'http://127.0.0.1:8080',
                 'http://192.168.1.111:8080'

@@ -199,7 +199,6 @@ class ArchivosOperaciones(Resource):
                         filename, content_type = self._procesar_archivo(campo)
                         if filename:  # Solo si se procesó correctamente
                             setattr(operacion, f"{campo}_path", filename)
-                            setattr(operacion, f"{campo}_tipo", content_type)
                             archivos_procesados.append(campo)
                     except ValueError as e:
                         return {'message': str(e)}, 400
